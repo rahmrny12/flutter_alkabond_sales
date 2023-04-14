@@ -8,6 +8,10 @@ class SalesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("Sales"));
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Sales'),
+        ),
+        body: Center(child: Text("Sales")));
   }
 }

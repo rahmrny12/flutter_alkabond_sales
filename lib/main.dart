@@ -5,6 +5,8 @@ import 'package:flutter_alkabond_sales/pages/dashboard/dashboard_page.dart';
 import 'package:flutter_alkabond_sales/pages/home/home_binding.dart';
 import 'package:flutter_alkabond_sales/pages/home/home_controller.dart';
 import 'package:flutter_alkabond_sales/pages/home/home_page.dart';
+import 'package:flutter_alkabond_sales/pages/login/login_binding.dart';
+import 'package:flutter_alkabond_sales/pages/login/login_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_binding.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_page.dart';
 import 'package:get/get.dart';
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'Penjualan Alkabond',
       theme: CustomTheme.light(),
       home: const HomePage(),
-      initialRoute: '/',
+      initialRoute: '/home',
       getPages: [
         GetPage(
           name: '/',
@@ -31,9 +33,9 @@ class MyApp extends StatelessWidget {
           binding: HomeBinding(),
         ),
         GetPage(
-          name: '/dashboard',
-          page: () => const DashboardPage(),
-          binding: DashboardBinding(),
+          name: '/login',
+          page: () => LoginPage(),
+          binding: LoginBinding(),
         ),
         GetPage(
           name: '/dashboard',
