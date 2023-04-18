@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_alkabond_sales/model/product_model.dart';
 import 'package:flutter_alkabond_sales/model/store_model.dart';
 import 'package:flutter_alkabond_sales/model/type_model.dart';
@@ -15,8 +16,53 @@ class SalesController extends GetxController {
   List<ProductModel> products = <ProductModel>[].obs;
   List<TypeModel> productTypes = <TypeModel>[].obs;
 
+  List<Map<String, dynamic>> selectedProductList = <Map<String, dynamic>>[].obs;
+  var total = 0.obs;
+
+  // List<TextEditingController> quantityControllers =
+  //     <TextEditingController>[].obs;
+
+  // List<TextEditingController> priceControllers = <TextEditingController>[].obs;
+
   Rxn<TypeModel> selectedProductType = Rxn<TypeModel>();
   Rxn<ProductModel> selectedProduct = Rxn<ProductModel>();
+
+  void addProductToSale() {
+    selectedProductList.add({
+      "product": selectedProduct.value!,
+      "quantity": 0,
+      "price": 0,
+      "subtotal": 0,
+    });
+    update();
+    // quantityControllers.add(TextEditingController());
+    // priceControllers.add(TextEditingController());
+  }
+
+  void setProductQuantity(int index, String value) {
+    selectedProductList[index]['quantity'] = value;
+    setProductSubTotal(index, selectedProductList[index]['price'],
+        selectedProductList[index]['quantity']);
+    update();
+  }
+
+  void setProductPrice(int index, String value) {
+    selectedProductList[index]['price'] = value;
+    setProductSubTotal(index, selectedProductList[index]['price'],
+        selectedProductList[index]['quantity']);
+    update();
+  }
+
+  void setProductSubTotal(int index, String price, String quantity) {
+    selectedProductList[index]['subtotal'] =
+        int.parse(price) * int.parse(quantity);
+    total.value = 0;
+    for (var product in selectedProductList) {
+      int subtotal = product['subtotal'];
+      total.value += subtotal;
+    }
+    update();
+  }
 
   void selectProductByType(TypeModel type) {
     selectedProductType.value = type;
