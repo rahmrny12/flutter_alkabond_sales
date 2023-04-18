@@ -11,6 +11,7 @@ import 'package:flutter_alkabond_sales/pages/login/login_controller.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_page.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       controller.updateIsLoading(true);
       http.Response response =
-          await http.post(Uri.tryParse('$BASE_URL/api/login')!, body: {
+          await http.post(Uri.tryParse('$baseUrl/api/login')!, body: {
         'email': usernameController.text,
         'password': passwordController.text,
       });
@@ -38,8 +39,8 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         log(user.message.toString());
         Get.toNamed('/home');
-        // final SharedPreferences prefs = await SharedPreferences.getInstance();
-        // prefs.setString('login_token', user.accessToken!);
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('login_token', user.accessToken!);
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -135,7 +136,6 @@ class _LoginPageState extends State<LoginPage> {
                                       ? null
                                       : () {
                                           loginUser(context);
-                                          // Get.toNamed('/home');
                                         },
                                   style: ButtonStyle(
                                       shape: MaterialStatePropertyAll(

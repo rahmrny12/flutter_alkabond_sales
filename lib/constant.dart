@@ -1,4 +1,5 @@
-String BASE_URL = 'http://10.0.2.2:8000';
+const String baseUrl = 'http://10.0.2.2:8000';
+// String BASE_URL = 'http://10.0.2.2:8000';
 
 class CustomPadding {
   static double extraSmallPadding = 8;

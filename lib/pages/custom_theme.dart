@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomTheme {
   static light() => ThemeData(
+        hintColor: Colors.white,
         textTheme: const TextTheme(
           headline1: TextStyle(
             fontFamily: "Montserrat",
@@ -39,7 +40,11 @@ class CustomTheme {
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
+        ).apply(
+          bodyColor: Colors.white,
+          displayColor: Colors.white,
         ),
+        scaffoldBackgroundColor: const Color(0xFF353434),
         colorScheme: const ColorScheme(
           primary: Color(0xFF008080),
           onPrimary: Color(0xFFFFFFFF),

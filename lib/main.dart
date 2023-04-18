@@ -10,13 +10,20 @@ import 'package:flutter_alkabond_sales/pages/login/login_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_binding.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_page.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var email = prefs.getString('login_token');
+
+  runApp(MyApp(email: email));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.email});
+
+  final String? email;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +32,7 @@ class MyApp extends StatelessWidget {
       title: 'Penjualan Alkabond',
       theme: CustomTheme.light(),
       home: const HomePage(),
-      initialRoute: '/home',
+      initialRoute: email != null ? '/' : '/login',
       getPages: [
         GetPage(
           name: '/',
