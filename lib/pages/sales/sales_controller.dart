@@ -224,7 +224,7 @@ class SalesController extends GetxController {
               }));
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {
-        var transaction = TransactionModel.fromJson(json);
+        var transaction = TransactionModel.fromJson(json['data']);
         print(transaction.toString());
       } else {
         log(response.body);

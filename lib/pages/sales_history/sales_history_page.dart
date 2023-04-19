@@ -76,15 +76,16 @@ class SalesHistoryPage extends StatelessWidget {
   Widget buildDoneHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
     return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(),
+      future: salesHistoryController.fetchTransactions(HistoryType.done.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
           if (snap.hasData) {
             List<TransactionModel> transactions = snap.data!;
             return ListView.builder(
+              itemCount: transactions.length,
               itemBuilder: (context, index) {
                 return buildHistoryCard(
-                    context, HistoryType.process, transactions[index]);
+                    context, HistoryType.done, transactions[index]);
               },
             );
           } else {
@@ -100,15 +101,16 @@ class SalesHistoryPage extends StatelessWidget {
   Widget buildTempoHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
     return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(),
+      future: salesHistoryController.fetchTransactions(HistoryType.tempo.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
           if (snap.hasData) {
             List<TransactionModel> transactions = snap.data!;
             return ListView.builder(
+              itemCount: transactions.length,
               itemBuilder: (context, index) {
                 return buildHistoryCard(
-                    context, HistoryType.process, transactions[index]);
+                    context, HistoryType.tempo, transactions[index]);
               },
             );
           } else {
@@ -124,15 +126,16 @@ class SalesHistoryPage extends StatelessWidget {
   Widget buildOnSentHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
     return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(),
+      future: salesHistoryController.fetchTransactions(HistoryType.onsent.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
           if (snap.hasData) {
             List<TransactionModel> transactions = snap.data!;
             return ListView.builder(
+              itemCount: transactions.length,
               itemBuilder: (context, index) {
                 return buildHistoryCard(
-                    context, HistoryType.process, transactions[index]);
+                    context, HistoryType.onsent, transactions[index]);
               },
             );
           } else {
@@ -148,7 +151,8 @@ class SalesHistoryPage extends StatelessWidget {
   Widget buildProcessHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
     return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(),
+      future:
+          salesHistoryController.fetchTransactions(HistoryType.process.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
           if (snap.hasData) {
@@ -173,9 +177,10 @@ class SalesHistoryPage extends StatelessWidget {
   Widget buildHistoryCard(
       BuildContext context, HistoryType type, TransactionModel transaction) {
     return GestureDetector(
-      onTap: (() => Get.toNamed("/sales-detail",
-          arguments: true,
-          parameters: {"invoice-code": transaction.invoiceCode})),
+      onTap: (() => Get.toNamed("/sales-detail", arguments: true, parameters: {
+            "invoice-code": transaction.invoiceCode,
+            "type": type.name
+          })),
       child: Container(
         margin: EdgeInsets.all(CustomPadding.mediumPadding),
         decoration: BoxDecoration(

@@ -20,6 +20,7 @@ class SalesDetail extends StatelessWidget {
       ),
       body:
           GetBuilder<SalesHistoryController>(builder: (salesHistoryController) {
+        String type = Get.parameters['type']!;
         return FutureBuilder<TransactionDetailModel?>(
             future: salesHistoryController.fetchTransactionDetail(),
             builder: (context, snap) {
@@ -170,7 +171,10 @@ class SalesDetail extends StatelessWidget {
                             SizedBox(height: CustomPadding.extraSmallPadding),
                             Column(
                               children: [
-                                buildSubtotal(context, {}),
+                                ...List.generate(
+                                    transactionDetail.subdata.length,
+                                    (index) => buildSubtotal(context,
+                                        transactionDetail.subdata[index])),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
                                       vertical:
@@ -193,7 +197,9 @@ class SalesDetail extends StatelessWidget {
                                                         .colorScheme
                                                         .onSecondary)),
                                       ),
-                                      Text(parseToRupiah(0),
+                                      Text(
+                                          parseToRupiah(transactionDetail
+                                              .data.grandTotal),
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline6!
@@ -271,9 +277,7 @@ class SalesDetail extends StatelessWidget {
     );
   }
 
-  Widget buildSubtotal(
-      BuildContext context, Map<String, dynamic> selectedProductList) {
-    ProductModel? product = selectedProductList['product'];
+  Widget buildSubtotal(BuildContext context, ProductDetail product) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: CustomPadding.extraSmallPadding),
       child: Row(
@@ -282,11 +286,11 @@ class SalesDetail extends StatelessWidget {
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.6,
             child: Text(
-                "Subtotal untuk ${product?.productName ?? "-"} - ${product?.productBrand ?? "-"} - ${product?.unitWeight ?? "-"}",
+                "Subtotal untuk ${product.productName} - ${product.productBrand} - ${product.unitWeight}",
                 style: Theme.of(context).textTheme.headline6!.copyWith(
                     color: Theme.of(context).colorScheme.onSecondary)),
           ),
-          Text(parseToRupiah(selectedProductList['subtotal'] ?? 0),
+          Text(parseToRupiah(product.subtotal),
               style: Theme.of(context)
                   .textTheme
                   .headline6!
