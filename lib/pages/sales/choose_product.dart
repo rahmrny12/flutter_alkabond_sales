@@ -23,7 +23,7 @@ class ChooseProducts extends StatelessWidget {
       child: GetBuilder<SalesController>(builder: (salesController) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           children: [
             SizedBox(
                 width: MediaQuery.of(context).size.width * 0.9,
