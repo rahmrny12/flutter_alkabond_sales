@@ -54,7 +54,7 @@ class CustomTheme {
           onError: Color(0xFFFFFFFF),
           background: Color(0xFF353434),
           onBackground: Color(0xFFAEAEAE),
-          surface: Color(0xFF787E7E),
+          surface: Color(0xFFD9D9D9),
           onSurface: Color(0xFFFFFFFF),
           brightness: Brightness.light,
         ),

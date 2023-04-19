@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
+import 'package:flutter_alkabond_sales/helper/alert_snackbar.dart';
 import 'package:flutter_alkabond_sales/model/store_model.dart';
-import 'package:flutter_alkabond_sales/pages/sales/control_button.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
 import 'package:get/get.dart';
 
@@ -19,7 +19,6 @@ class ChooseStore extends StatefulWidget {
 }
 
 class _ChooseStoreState extends State<ChooseStore> {
-  StoreModel? selectedStore;
   final _formAddStoreKey = GlobalKey<FormState>();
   final TextEditingController _storeNameController = TextEditingController();
   final TextEditingController _storeAddressController = TextEditingController();
@@ -49,30 +48,54 @@ class _ChooseStoreState extends State<ChooseStore> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width,
                         child: DropdownSearch<StoreModel>(
-                          popupProps: PopupProps.dialog(
-                            dialogProps: DialogProps(
+                          popupProps: PopupProps.menu(
+                            menuProps: MenuProps(
                               backgroundColor:
-                                  Theme.of(context).colorScheme.background,
-                              contentTextStyle:
-                                  Theme.of(context).textTheme.headline5,
+                                  Theme.of(context).colorScheme.surface,
+                              textStyle: Theme.of(context)
+                                  .textTheme
+                                  .headline4!
+                                  .copyWith(color: Colors.white),
                             ),
-                            textStyle: Theme.of(context).textTheme.headline5,
+                            textStyle: Theme.of(context)
+                                .textTheme
+                                .headline4!
+                                .copyWith(color: Colors.white),
                             showSelectedItems: true,
-                            showSearchBox: true,
+                            // showSearchBox: true,
                           ),
                           compareFn: (item1, item2) => item1.isEqual(item2),
                           filterFn: (item, filter) =>
                               item.storeFilterByName(filter),
                           asyncItems: (text) => salesController.fetchStores(),
                           itemAsString: (item) => item.storeName,
-                          dropdownDecoratorProps: const DropDownDecoratorProps(
+                          dropdownDecoratorProps: DropDownDecoratorProps(
+                            baseStyle: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary),
                             dropdownSearchDecoration: InputDecoration(
-                              labelText: "Pilih toko",
-                            ),
+                                labelText: "Pilih toko",
+                                labelStyle: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .copyWith(color: Colors.white)),
                           ),
+                          dropdownBuilder:
+                              (BuildContext context, StoreModel? store) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                  top: CustomPadding.extraSmallPadding),
+                              child: Text(store == null ? "-" : store.storeName,
+                                  style: Theme.of(context).textTheme.headline5),
+                            );
+                          },
                           onChanged: (value) =>
-                              setState(() => selectedStore = value),
-                          selectedItem: selectedStore,
+                              salesController.selectedStore.value = value,
+                          selectedItem: salesController.selectedStore.value,
                         ),
                       ),
                       SizedBox(height: CustomPadding.smallPadding),
@@ -188,7 +211,53 @@ class _ChooseStoreState extends State<ChooseStore> {
         ),
         Padding(
           padding: EdgeInsets.only(bottom: CustomPadding.largePadding),
-          child: buildControlButton(context, widget.pageController),
+          child: Row(
+            children: [
+              SizedBox(width: CustomPadding.largePadding),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    widget.pageController.previousPage(
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn);
+                    salesController.currentStep.value =
+                        widget.pageController.page!.round();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(
+                              width: 2,
+                              color: Theme.of(context).colorScheme.primary))),
+                  child: Text("Kembali"),
+                ),
+              ),
+              SizedBox(width: CustomPadding.largePadding),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (salesController.selectedStore.value != null) {
+                      widget.pageController.nextPage(
+                          duration: Duration(milliseconds: 200),
+                          curve: Curves.easeIn);
+                      salesController.currentStep.value =
+                          widget.pageController.page!.round();
+                    } else {
+                      buildAlertSnackBar(
+                          context, "Pilih toko terlebih dahulu...");
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20))),
+                  child: Text("Selanjutnya"),
+                ),
+              ),
+              SizedBox(width: CustomPadding.largePadding),
+            ],
+          ),
         ),
       ],
     );

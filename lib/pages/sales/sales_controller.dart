@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_alkabond_sales/model/product_model.dart';
 import 'package:flutter_alkabond_sales/model/store_model.dart';
+import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/model/type_model.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../constant.dart';
 
 class SalesController extends GetxController {
+  var currentStep = 0.obs;
   List<StoreModel> stores = <StoreModel>[].obs;
   List<ProductModel> products = <ProductModel>[].obs;
   List<TypeModel> productTypes = <TypeModel>[].obs;
@@ -19,38 +22,38 @@ class SalesController extends GetxController {
   List<Map<String, dynamic>> selectedProductList = <Map<String, dynamic>>[].obs;
   var total = 0.obs;
 
-  // List<TextEditingController> quantityControllers =
-  //     <TextEditingController>[].obs;
-
-  // List<TextEditingController> priceControllers = <TextEditingController>[].obs;
-
-  Rxn<TypeModel> selectedProductType = Rxn<TypeModel>();
-  Rxn<ProductModel> selectedProduct = Rxn<ProductModel>();
+  var selectedStore = Rxn<StoreModel>();
+  var selectedProductType = Rxn<TypeModel>();
+  var selectedProduct = Rxn<ProductModel>();
 
   void addProductToSale() {
-    selectedProductList.add({
-      "product": selectedProduct.value!,
-      "quantity": 0,
-      "price": 0,
-      "subtotal": 0,
-    });
-    update();
-    // quantityControllers.add(TextEditingController());
-    // priceControllers.add(TextEditingController());
+    if (selectedProduct.value != null) {
+      selectedProductList.add({
+        "product": selectedProduct.value,
+        "quantity": "0",
+        "price": "0",
+        "subtotal": 0,
+      });
+      update();
+    }
   }
 
   void setProductQuantity(int index, String value) {
-    selectedProductList[index]['quantity'] = value;
-    setProductSubTotal(index, selectedProductList[index]['price'],
-        selectedProductList[index]['quantity']);
-    update();
+    if (value.isNotEmpty) {
+      selectedProductList[index]['quantity'] = value;
+      setProductSubTotal(index, selectedProductList[index]['price'],
+          selectedProductList[index]['quantity']);
+      update();
+    }
   }
 
   void setProductPrice(int index, String value) {
-    selectedProductList[index]['price'] = value;
-    setProductSubTotal(index, selectedProductList[index]['price'],
-        selectedProductList[index]['quantity']);
-    update();
+    if (value.isNotEmpty) {
+      selectedProductList[index]['price'] = value;
+      setProductSubTotal(index, selectedProductList[index]['price'],
+          selectedProductList[index]['quantity']);
+      update();
+    }
   }
 
   void setProductSubTotal(int index, String price, String quantity) {
@@ -81,6 +84,11 @@ class SalesController extends GetxController {
   void onInit() {
     super.onInit();
     fetchProductsByType();
+  }
+
+  Future<String?> getLoggedInSalesName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('name');
   }
 
   Future<List<StoreModel>> fetchStores() async {
@@ -162,7 +170,7 @@ class SalesController extends GetxController {
     return productTypes;
   }
 
-  Future<List<ProductModel>> fetchProductsByType({
+  void fetchProductsByType({
     TypeModel? productType,
   }) async {
     try {
@@ -185,6 +193,44 @@ class SalesController extends GetxController {
     } on Exception catch (e) {
       log(e.toString());
     }
-    return products;
+  }
+
+  Future<void> checkoutOrder() async {
+    Map<String, dynamic> products = {};
+    selectedProductList.asMap().forEach((index, item) {
+      ProductModel product = item['product'];
+      products["$index"] = {
+        "product_id": product.id,
+        "quantity": item["quantity"],
+        "price": item["price"],
+      };
+    });
+
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      http.Response response =
+          await http.post(Uri.parse("$baseUrl/api/transaction"),
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ${prefs.getString('login_token')!}',
+              },
+              body: jsonEncode({
+                "grand_total": total.value,
+                "store_id": selectedStore.value!.id,
+                "payment_method": "cash",
+                "status": "unpaid",
+                "detail": products,
+              }));
+      var json = jsonDecode(response.body);
+      if (response.statusCode == 200 && json['status_code'] == 200) {
+        var transaction = TransactionModel.fromJson(json);
+        print(transaction.toString());
+      } else {
+        log(response.body);
+      }
+    } on Exception catch (e) {
+      log(e.toString());
+    }
   }
 }

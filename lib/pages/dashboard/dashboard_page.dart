@@ -97,7 +97,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 horizontal: CustomPadding.largePadding,
                 vertical: CustomPadding.extraLargePadding),
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+                color: Theme.of(context).colorScheme.onBackground,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -125,7 +125,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 Get.toNamed('/sales');
               }),
               buildSecondDashboardCard(context, "Riwayat", "Transaksi", () {
-                Get.toNamed('/sales');
+                Get.toNamed('/sales-history');
               }),
             ],
           )

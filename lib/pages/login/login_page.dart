@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
+import 'package:flutter_alkabond_sales/helper/alert_snackbar.dart';
 import 'package:flutter_alkabond_sales/model/user_model.dart';
 import 'package:flutter_alkabond_sales/pages/dashboard/dashboard_page.dart';
 import 'package:flutter_alkabond_sales/pages/home/home_controller.dart';
@@ -30,26 +31,22 @@ class _LoginPageState extends State<LoginPage> {
     try {
       controller.updateIsLoading(true);
       http.Response response =
-          await http.post(Uri.tryParse('$baseUrl/api/login')!, body: {
+          await http.post(Uri.parse('$baseUrl/api/login'), body: {
         'email': usernameController.text,
         'password': passwordController.text,
       });
-      var result = jsonDecode(response.body);
-      UserModel user = UserModel.fromJson(result);
       if (response.statusCode == 200) {
-        log(user.message.toString());
-        Get.toNamed('/home');
+        UserModel user = userModelFromJson(response.body);
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('login_token', user.accessToken!);
+        prefs.setString('login_token', user.accessToken);
+        prefs.setInt('id', user.data.id);
+        prefs.setString('username', user.data.username);
+        prefs.setString('name', user.data.salesName);
+        Get.toNamed('/home');
       } else {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          duration: Duration(milliseconds: 500),
-          content: Text("Login gagal. Pesan : ${user.message}",
-              style:
-                  TextStyle(color: Theme.of(context).colorScheme.onSecondary)),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-        ));
+        buildAlertSnackBar(context,
+            "Login gagal. Pesan : ${jsonDecode(response.body)['message']}");
         log(response.body);
       }
     } catch (e) {
@@ -59,7 +56,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -73,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                   Positioned(
                     bottom: 0,
                     child: Image.asset(
-                      "assets/img/blob-login.png",
+                      "$imagePath/blob-login.png",
                       fit: BoxFit.fitWidth,
                     ),
                   ),
@@ -81,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Spacer(),
                       Image.asset(
-                        "assets/img/logo.png",
+                        "$imagePath/logo.png",
                         width: 150,
                       ),
                       Padding(

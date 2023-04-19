@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_alkabond_sales/pages/sales/control_button.dart';
+import 'package:flutter_alkabond_sales/helper/alert_snackbar.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
 import 'package:get/get.dart';
 
@@ -17,11 +17,13 @@ class ChooseProducts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formAddProductKey = GlobalKey<FormState>();
+    final productSubtotalKey = GlobalKey<FormState>();
 
     return SingleChildScrollView(
       child: GetBuilder<SalesController>(builder: (salesController) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
                 width: MediaQuery.of(context).size.width * 0.9,
@@ -145,13 +147,14 @@ class ChooseProducts extends StatelessWidget {
                                                           .selectedProduct
                                                           .value
                                                           ?.id ??
-                                                      1,
-                                                  onChanged: (value) =>
-                                                      salesController
-                                                          .setSelectedProduct(
-                                                              salesController
-                                                                      .products[
-                                                                  index]))),
+                                                      0,
+                                                  onChanged: (value) {
+                                                    salesController
+                                                        .setSelectedProduct(
+                                                            salesController
+                                                                    .products[
+                                                                index]);
+                                                  })),
                                           SizedBox(
                                               height:
                                                   CustomPadding.mediumPadding),
@@ -244,14 +247,79 @@ class ChooseProducts extends StatelessWidget {
                     child: const Text("Tambah Produk"))),
             ...List.generate(
               salesController.selectedProductList.length,
-              (index) => buildProductCard(context, salesController, index),
+              (index) => buildProductCard(
+                  context, productSubtotalKey, salesController, index),
             ),
             if (salesController.selectedProductList.isNotEmpty)
               buildTotalPaymentCard(context, salesController),
             SizedBox(height: CustomPadding.mediumPadding),
             Padding(
               padding: EdgeInsets.only(bottom: CustomPadding.largePadding),
-              child: buildControlButton(context, pageController),
+              child: Row(
+                children: [
+                  SizedBox(width: CustomPadding.largePadding),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        pageController.previousPage(
+                            duration: Duration(milliseconds: 200),
+                            curve: Curves.easeIn);
+                        salesController.currentStep.value =
+                            pageController.page!.round();
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.background,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(
+                                  width: 2,
+                                  color:
+                                      Theme.of(context).colorScheme.primary))),
+                      child: Text("Kembali"),
+                    ),
+                  ),
+                  SizedBox(width: CustomPadding.largePadding),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        bool checkPriceAndQuantity() {
+                          for (var element
+                              in salesController.selectedProductList) {
+                            var quantity = element["quantity"];
+                            var price = element["price"];
+                            if (quantity != "0" || price != "0") {
+                              return false;
+                            }
+                          }
+                          return true;
+                        }
+
+                        if (salesController.selectedProductList.isEmpty) {
+                          buildAlertSnackBar(
+                              context, "Pilih produk terlebih dahulu...");
+                        } else if (checkPriceAndQuantity()) {
+                          buildAlertSnackBar(context,
+                              "Pilih harga dan jumlah produk terlebih dahulu...");
+                        } else {
+                          pageController.nextPage(
+                              duration: Duration(milliseconds: 200),
+                              curve: Curves.easeIn);
+                          salesController.currentStep.value =
+                              pageController.page!.round();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20))),
+                      child: Text("Selanjutnya"),
+                    ),
+                  ),
+                  SizedBox(width: CustomPadding.largePadding),
+                ],
+              ),
             ),
           ],
         );
@@ -274,7 +342,7 @@ class ChooseProducts extends StatelessWidget {
               style: Theme.of(context).textTheme.headline5!.copyWith(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.onSecondary)),
-          Text(salesController.total.value.toString(),
+          Text(parseToRupiah(salesController.total.value),
               style: Theme.of(context).textTheme.headline5!.copyWith(
                   fontWeight: FontWeight.w700,
                   color: Theme.of(context).colorScheme.onSecondary)),
@@ -304,7 +372,10 @@ class ChooseProducts extends StatelessWidget {
   }
 
   Widget buildProductCard(
-      BuildContext context, SalesController salesController, int index) {
+      BuildContext context,
+      GlobalKey<FormState> productSubtotalKey,
+      SalesController salesController,
+      int index) {
     return Container(
       padding: EdgeInsets.all(CustomPadding.mediumPadding),
       margin: EdgeInsets.all(CustomPadding.smallPadding),
@@ -322,38 +393,43 @@ class ChooseProducts extends StatelessWidget {
                     style: Theme.of(context).textTheme.headline6!.copyWith(
                         color: Theme.of(context).colorScheme.onSecondary)),
               )),
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              buildProductCardText(
-                context: context,
-                index: index,
-                label: "Produk",
-                value:
-                    "${salesController.selectedProductList[index]['product'].productName} - ${salesController.selectedProductList[index]['product'].productBrand} - ${salesController.selectedProductList[index]['product'].unitWeight}",
-              ),
-              buildProductCardText(
-                context: context,
-                index: index,
-                label: "Produk",
-                updateValue: (p0, p1) =>
-                    salesController.setProductPrice(p0, p1),
-              ),
-              buildProductCardText(
-                context: context,
-                index: index,
-                label: "Jumlah",
-                updateValue: (p0, p1) =>
-                    salesController.setProductQuantity(p0, p1),
-              ),
-              buildProductCardText(
-                context: context,
-                index: index,
-                label: "Subtotal",
-                value: salesController.selectedProductList[index]['subtotal']
-                    .toString(),
-              ),
-            ],
+          Form(
+            // key: productSubtotalKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                buildProductCardRow(
+                  context: context,
+                  index: index,
+                  label: "Produk",
+                  value:
+                      "${salesController.selectedProductList[index]['product'].productName} - ${salesController.selectedProductList[index]['product'].productBrand} - ${salesController.selectedProductList[index]['product'].unitWeight}",
+                ),
+                buildProductCardRow(
+                  context: context,
+                  index: index,
+                  label: "Harga",
+                  value: salesController.selectedProductList[index]['price'],
+                  updateValue: (p0, p1) =>
+                      salesController.setProductPrice(p0, p1),
+                ),
+                buildProductCardRow(
+                  context: context,
+                  index: index,
+                  label: "Jumlah",
+                  value: salesController.selectedProductList[index]['quantity'],
+                  updateValue: (p0, p1) =>
+                      salesController.setProductQuantity(p0, p1),
+                ),
+                buildProductCardRow(
+                  context: context,
+                  index: index,
+                  label: "Subtotal",
+                  value: parseToRupiah(
+                      salesController.selectedProductList[index]['subtotal']),
+                ),
+              ],
+            ),
           ),
           // Text(salesController.selectedProductList[index]['quantity']
           //     .toString()),
@@ -363,7 +439,7 @@ class ChooseProducts extends StatelessWidget {
     );
   }
 
-  Widget buildProductCardText({
+  Widget buildProductCardRow({
     required BuildContext context,
     required String label,
     required int index,
@@ -392,19 +468,28 @@ class ChooseProducts extends StatelessWidget {
             ),
           ),
           SizedBox(width: CustomPadding.smallPadding),
-          (value != null)
+          (updateValue == null)
               ? SizedBox(
                   width: MediaQuery.of(context).size.width * 0.6,
-                  child: Text(value,
+                  child: Text(value ?? "-",
                       style: Theme.of(context).textTheme.headline6!.copyWith(
                           color: Theme.of(context).colorScheme.onSecondary)),
                 )
               : SizedBox(
                   width: MediaQuery.of(context).size.width * 0.6,
-                  child: TextField(
-                    onChanged: (value) {
-                      updateValue!(index, value);
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '$label wajib diisi.';
+                      }
+                      return null;
                     },
+                    onChanged: (value) {
+                      updateValue(index, value);
+                    },
+                    initialValue: value == "0" ? "" : value,
                     decoration: InputDecoration(
                         filled: true,
                         fillColor: Theme.of(context)
