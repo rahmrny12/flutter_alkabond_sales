@@ -18,16 +18,18 @@ class _ProfilePageState extends State<ProfilePage> {
         appBar: AppBar(
           title: Text('Profile'),
         ),
-        body: ElevatedButton(
-          onPressed: () async {
-            final SharedPreferences prefs =
-                await SharedPreferences.getInstance();
-            prefs.remove("login_token");
-            if (!mounted) return;
-            Navigator.pop(context);
-            Get.toNamed("/login");
-          },
-          child: Text("Logout"),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () async {
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              prefs.remove("login_token");
+              if (!mounted) return;
+              Navigator.pop(context);
+              Get.toNamed("/login");
+            },
+            child: Text("Logout"),
+          ),
         ));
   }
 }

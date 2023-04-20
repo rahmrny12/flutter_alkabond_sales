@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
+import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/model/product_model.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
+import 'package:flutter_alkabond_sales/pages/success_page.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -43,7 +45,7 @@ class _CheckoutState extends State<Checkout> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Alamat Toko",
+                      Text("Keterangan Toko",
                           style: Theme.of(context)
                               .textTheme
                               .headline6!
@@ -55,7 +57,7 @@ class _CheckoutState extends State<Checkout> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.7,
                         child: Text(
-                            salesController.selectedStore.value!.address,
+                            "${salesController.selectedStore.value!.storeName} - ${salesController.selectedStore.value!.address}",
                             style: Theme.of(context)
                                 .textTheme
                                 .headline6!
@@ -261,36 +263,9 @@ class _CheckoutState extends State<Checkout> {
                                 widget.pageController.page!.round();
 
                             if (salesController.currentStep.value == 2) {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Dialog(
-                                    // The background color
-                                    backgroundColor: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 20),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: const [
-                                          // The loading indicator
-                                          CircularProgressIndicator(),
-                                          SizedBox(
-                                            height: 15,
-                                          ),
-                                          // Some text
-                                          Text('Loading...')
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                              await salesController.checkoutOrder();
-                              if (!mounted) return;
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                              Get.toNamed("/success");
+                              buildLoadingDialog(context);
+                              await salesController.checkoutOrder(
+                                  context, mounted);
                             }
                           },
                           style: ElevatedButton.styleFrom(

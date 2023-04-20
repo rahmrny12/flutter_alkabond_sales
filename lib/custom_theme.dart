@@ -50,7 +50,7 @@ class CustomTheme {
           onPrimary: Color(0xFFFFFFFF),
           secondary: Color(0xFF92CCBB),
           onSecondary: Color(0xFF1E1E1E),
-          error: Color(0xFFFF0033),
+          error: Color.fromARGB(255, 255, 32, 77),
           onError: Color(0xFFFFFFFF),
           background: Color(0xFF353434),
           onBackground: Color(0xFFAEAEAE),

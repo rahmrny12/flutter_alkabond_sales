@@ -7,6 +7,8 @@ import 'package:flutter_alkabond_sales/pages/home/home_controller.dart';
 import 'package:flutter_alkabond_sales/pages/home/home_page.dart';
 import 'package:flutter_alkabond_sales/pages/login/login_binding.dart';
 import 'package:flutter_alkabond_sales/pages/login/login_page.dart';
+import 'package:flutter_alkabond_sales/pages/payment/pay_tempo_page.dart';
+import 'package:flutter_alkabond_sales/pages/payment/return_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_binding.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_detail_page.dart';
@@ -63,13 +65,13 @@ class MyApp extends StatelessWidget {
           page: () => const SalesHistoryPage(),
           binding: SalesHistoryBinding(),
         ),
+        // GetPage(
+        //   name: '/sales-detail',
+        //   page: () => const SalesDetail(),
+        // ),
         GetPage(
-          name: '/sales-detail',
-          page: () => const SalesDetail(),
-        ),
-        GetPage(
-          name: '/success',
-          page: () => const SuccessPage(),
+          name: '/return',
+          page: () => const ReturnPage(),
         ),
       ],
     );

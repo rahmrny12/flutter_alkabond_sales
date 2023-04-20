@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
+import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_detail_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_controller.dart';
@@ -15,13 +16,16 @@ enum HistoryType {
   done,
 }
 
-class SalesHistoryPage extends StatelessWidget {
+class SalesHistoryPage extends StatefulWidget {
   const SalesHistoryPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // final historyController = Get.put(SalesHistoryController());
+  State<SalesHistoryPage> createState() => _SalesHistoryPageState();
+}
 
+class _SalesHistoryPageState extends State<SalesHistoryPage> {
+  @override
+  Widget build(BuildContext context) {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -79,18 +83,20 @@ class SalesHistoryPage extends StatelessWidget {
       future: salesHistoryController.fetchTransactions(HistoryType.done.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
-          if (snap.hasData) {
-            List<TransactionModel> transactions = snap.data!;
+          List<TransactionModel>? transactions = snap.data;
+          if (transactions != null) {
             return ListView.builder(
               itemCount: transactions.length,
               itemBuilder: (context, index) {
-                return buildHistoryCard(
-                    context, HistoryType.done, transactions[index]);
+                return buildHistoryCard(context, HistoryType.done,
+                    transactions[index], salesHistoryController);
               },
             );
           } else {
             return Text("Data riwayat kosong.");
           }
+        } else if (snap.hasError) {
+          return buildRefreshHistoryButton(context);
         } else {
           return Center(child: CircularProgressIndicator());
         }
@@ -104,18 +110,20 @@ class SalesHistoryPage extends StatelessWidget {
       future: salesHistoryController.fetchTransactions(HistoryType.tempo.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
-          if (snap.hasData) {
-            List<TransactionModel> transactions = snap.data!;
+          List<TransactionModel>? transactions = snap.data;
+          if (transactions != null) {
             return ListView.builder(
               itemCount: transactions.length,
               itemBuilder: (context, index) {
-                return buildHistoryCard(
-                    context, HistoryType.tempo, transactions[index]);
+                return buildHistoryCard(context, HistoryType.tempo,
+                    transactions[index], salesHistoryController);
               },
             );
           } else {
             return Text("Data riwayat kosong.");
           }
+        } else if (snap.hasError) {
+          return buildRefreshHistoryButton(context);
         } else {
           return Center(child: CircularProgressIndicator());
         }
@@ -129,18 +137,20 @@ class SalesHistoryPage extends StatelessWidget {
       future: salesHistoryController.fetchTransactions(HistoryType.onsent.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
-          if (snap.hasData) {
-            List<TransactionModel> transactions = snap.data!;
+          List<TransactionModel>? transactions = snap.data;
+          if (transactions != null) {
             return ListView.builder(
               itemCount: transactions.length,
               itemBuilder: (context, index) {
-                return buildHistoryCard(
-                    context, HistoryType.onsent, transactions[index]);
+                return buildHistoryCard(context, HistoryType.onsent,
+                    transactions[index], salesHistoryController);
               },
             );
           } else {
             return Text("Data riwayat kosong.");
           }
+        } else if (snap.hasError) {
+          return buildRefreshHistoryButton(context);
         } else {
           return Center(child: CircularProgressIndicator());
         }
@@ -155,18 +165,20 @@ class SalesHistoryPage extends StatelessWidget {
           salesHistoryController.fetchTransactions(HistoryType.process.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
-          if (snap.hasData) {
-            List<TransactionModel> transactions = snap.data!;
+          List<TransactionModel>? transactions = snap.data;
+          if (transactions != null) {
             return ListView.builder(
               itemCount: transactions.length,
               itemBuilder: (context, index) {
-                return buildHistoryCard(
-                    context, HistoryType.process, transactions[index]);
+                return buildHistoryCard(context, HistoryType.process,
+                    transactions[index], salesHistoryController);
               },
             );
           } else {
             return Text("Data riwayat kosong.");
           }
+        } else if (snap.hasError) {
+          return buildRefreshHistoryButton(context);
         } else {
           return Center(child: CircularProgressIndicator());
         }
@@ -174,13 +186,54 @@ class SalesHistoryPage extends StatelessWidget {
     );
   }
 
+  Padding buildRefreshHistoryButton(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
+      child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => SalesHistoryPage()));
+          },
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              padding:
+                  EdgeInsets.symmetric(vertical: CustomPadding.smallPadding)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Refresh ulang",
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5!
+                    .copyWith(color: Theme.of(context).colorScheme.onSecondary),
+              ),
+              SizedBox(width: CustomPadding.extraSmallPadding),
+              Icon(Icons.refresh, color: Theme.of(context).colorScheme.primary),
+            ],
+          )),
+    );
+  }
+
   Widget buildHistoryCard(
-      BuildContext context, HistoryType type, TransactionModel transaction) {
+      BuildContext context,
+      HistoryType type,
+      TransactionModel transaction,
+      SalesHistoryController salesHistoryController) {
     return GestureDetector(
-      onTap: (() => Get.toNamed("/sales-detail", arguments: true, parameters: {
-            "invoice-code": transaction.invoiceCode,
-            "type": type.name
-          })),
+      onTap: (() {
+        salesHistoryController.grandTotal.value = transaction.grandTotal;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SalesDetail(
+                type: type,
+                transactionId: transaction.id,
+              ),
+            ));
+      }),
       child: Container(
         margin: EdgeInsets.all(CustomPadding.mediumPadding),
         decoration: BoxDecoration(
@@ -217,19 +270,19 @@ class SalesHistoryPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "",
+                    "Produk : ${transaction.transactionDetails[0].productName} - ${transaction.transactionDetails[0].productBrand} - ${transaction.transactionDetails[0].unitWeight}",
                     style: Theme.of(context).textTheme.headline6!.copyWith(
                         color: Theme.of(context).colorScheme.onSecondary),
                   ),
                   SizedBox(height: CustomPadding.extraSmallPadding),
                   Text(
-                    "Jumlah : 3x",
+                    "Jumlah : ${transaction.transactionDetails[0].quantity}",
                     style: Theme.of(context).textTheme.headline6!.copyWith(
                         color: Theme.of(context).colorScheme.onSecondary),
                   ),
                   SizedBox(height: CustomPadding.extraSmallPadding),
                   Text(
-                    "Harga : Rp 12.000",
+                    "Harga : ${parseToRupiah(transaction.transactionDetails[0].price)}",
                     style: Theme.of(context).textTheme.headline6!.copyWith(
                         color: Theme.of(context).colorScheme.onSecondary),
                   ),
@@ -266,7 +319,7 @@ class SalesHistoryPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "2 produk",
+                        "${transaction.transactionDetails.length} produk",
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                             color: Theme.of(context).colorScheme.onSecondary),
                       ),
@@ -310,32 +363,68 @@ class SalesHistoryPage extends StatelessWidget {
                 ),
               ),
             ),
-            if (type == HistoryType.onsent) buildOrderReceivedButton(context)
+            if (type == HistoryType.onsent)
+              if (transaction.deliveryStatus != "sent")
+                buildOrderReceivedButton(
+                    context, transaction, salesHistoryController)
           ],
         ),
       ),
     );
   }
 
-  Container buildOrderReceivedButton(BuildContext context) {
+  Container buildOrderReceivedButton(
+      BuildContext context,
+      TransactionModel transaction,
+      SalesHistoryController salesHistoryController) {
     return Container(
       width: MediaQuery.of(context).size.width,
       margin: EdgeInsets.fromLTRB(CustomPadding.smallPadding, 0,
           CustomPadding.smallPadding, CustomPadding.smallPadding),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () async {
+          buildLoadingDialog(context);
+          var result = await salesHistoryController.confirmDeliverySuccess(
+              context, transaction.id);
+          if (!mounted) return;
+          Navigator.pop(context);
+          if (result) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => SalesHistoryPage()));
+          } else {
+            if (!mounted) return;
+            buildAlertSnackBar(context, "Terjadi masalah. Coba lagi nanti.");
+          }
+        },
         style: ElevatedButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
                     width: 2, color: Theme.of(context).colorScheme.primary))),
-        child: Text("Pesanan Diterima",
-            style: Theme.of(context)
-                .textTheme
-                .headline5!
-                .copyWith(color: Theme.of(context).colorScheme.primary)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Pesanan Diterima",
+                style: Theme.of(context).textTheme.headline5!.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
+            // if (transaction.deliveryStatus == "sent")
+            //   Padding(
+            //     padding: EdgeInsets.only(left: CustomPadding.extraSmallPadding),
+            //     child: Icon(
+            //       Icons.check_circle,
+            //       color: Theme.of(context).colorScheme.onPrimary,
+            //     ),
+            //   )
+          ],
+        ),
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => false;
 }

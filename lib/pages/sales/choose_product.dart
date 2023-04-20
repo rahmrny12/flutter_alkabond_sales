@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_alkabond_sales/helper/alert_snackbar.dart';
+import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
 import 'package:get/get.dart';
 
@@ -72,53 +72,42 @@ class ChooseProducts extends StatelessWidget {
                                                     .copyWith(
                                                         color: Colors.black)),
                                           ),
-                                          FutureBuilder<List<TypeModel>>(
-                                              future: salesController
-                                                  .fetchProductTypes(),
-                                              builder: (context, snap) {
-                                                if (snap.connectionState ==
-                                                    ConnectionState.done) {
-                                                  List<TypeModel> types =
-                                                      snap.data!;
-                                                  return Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        horizontal:
-                                                            CustomPadding
-                                                                .mediumPadding),
-                                                    child: Wrap(
-                                                      spacing: CustomPadding
-                                                          .extraSmallPadding,
-                                                      children: [
-                                                        ...List.generate(
-                                                          snap.data!.length,
-                                                          (index) =>
-                                                              GestureDetector(
-                                                            onTap: () {
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: CustomPadding
+                                                    .mediumPadding),
+                                            child: Wrap(
+                                              spacing: CustomPadding
+                                                  .extraSmallPadding,
+                                              children: [
+                                                ...List.generate(
+                                                  salesController
+                                                      .productTypes.length,
+                                                  (index) => GestureDetector(
+                                                    onTap: () {
+                                                      salesController
+                                                          .selectProductByType(
                                                               salesController
-                                                                  .selectProductByType(
-                                                                      types[
-                                                                          index]);
-                                                            },
-                                                            child: buildFilterProductType(
-                                                                context,
-                                                                types[index]
-                                                                    .type,
-                                                                types[index].id,
-                                                                salesController),
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  );
-                                                } else {
-                                                  return Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: CustomPadding
-                                                              .mediumPadding),
-                                                      child:
-                                                          CircularProgressIndicator());
-                                                }
-                                              }),
+                                                                      .productTypes[
+                                                                  index]);
+                                                    },
+                                                    child:
+                                                        buildFilterProductType(
+                                                            context,
+                                                            salesController
+                                                                .productTypes[
+                                                                    index]
+                                                                .type,
+                                                            salesController
+                                                                .productTypes[
+                                                                    index]
+                                                                .id,
+                                                            salesController),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
                                           Padding(
                                             padding: EdgeInsets.only(
                                                 top:
@@ -136,25 +125,35 @@ class ChooseProducts extends StatelessWidget {
                                                     .copyWith(
                                                         color: Colors.black)),
                                           ),
-                                          ...List.generate(
-                                              salesController.products.length,
-                                              (index) => RadioListTile<int>(
-                                                  title: Text(
-                                                      "${salesController.products[index].productName} - ${salesController.products[index].productBrand} - ${salesController.products[index].unitWeight}"),
-                                                  value: salesController
-                                                      .products[index].id,
-                                                  groupValue: salesController
-                                                          .selectedProduct
-                                                          .value
-                                                          ?.id ??
-                                                      0,
-                                                  onChanged: (value) {
-                                                    salesController
-                                                        .setSelectedProduct(
+                                          (!salesController.isLoading.value)
+                                              ? Column(
+                                                  children: List.generate(
+                                                      salesController
+                                                          .products.length,
+                                                      (index) => RadioListTile<
+                                                              int>(
+                                                          title: Text(
+                                                              "${salesController.products[index].productName} - ${salesController.products[index].productBrand} - ${salesController.products[index].unitWeight}"),
+                                                          value: salesController
+                                                              .products[index]
+                                                              .id,
+                                                          groupValue:
+                                                              salesController
+                                                                      .selectedProduct
+                                                                      .value
+                                                                      ?.id ??
+                                                                  0,
+                                                          onChanged: (value) {
                                                             salesController
-                                                                    .products[
-                                                                index]);
-                                                  })),
+                                                                .setSelectedProduct(
+                                                                    salesController
+                                                                            .products[
+                                                                        index]);
+                                                          })),
+                                                )
+                                              : const Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
                                           SizedBox(
                                               height:
                                                   CustomPadding.mediumPadding),
@@ -290,7 +289,7 @@ class ChooseProducts extends StatelessWidget {
                               in salesController.selectedProductList) {
                             var quantity = element["quantity"];
                             var price = element["price"];
-                            if (quantity != "0" || price != "0") {
+                            if (quantity == "0" || price == "0") {
                               return false;
                             }
                           }
@@ -300,7 +299,7 @@ class ChooseProducts extends StatelessWidget {
                         if (salesController.selectedProductList.isEmpty) {
                           buildAlertSnackBar(
                               context, "Pilih produk terlebih dahulu...");
-                        } else if (checkPriceAndQuantity()) {
+                        } else if (!checkPriceAndQuantity()) {
                           buildAlertSnackBar(context,
                               "Pilih harga dan jumlah produk terlebih dahulu...");
                         } else {
@@ -470,13 +469,13 @@ class ChooseProducts extends StatelessWidget {
           SizedBox(width: CustomPadding.smallPadding),
           (updateValue == null)
               ? SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.5,
                   child: Text(value ?? "-",
                       style: Theme.of(context).textTheme.headline6!.copyWith(
                           color: Theme.of(context).colorScheme.onSecondary)),
                 )
               : SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.5,
                   child: TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     keyboardType: TextInputType.number,

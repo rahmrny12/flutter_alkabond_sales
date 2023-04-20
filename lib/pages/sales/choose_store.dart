@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
-import 'package:flutter_alkabond_sales/helper/alert_snackbar.dart';
+import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/model/store_model.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
 import 'package:get/get.dart';
@@ -181,16 +181,19 @@ class _ChooseStoreState extends State<ChooseStore> {
                                                     if (_formAddStoreKey
                                                         .currentState!
                                                         .validate()) {
-                                                      var result = await salesController.addStore(
+                                                      await salesController.addStore(
                                                           _storeNameController
                                                               .text,
                                                           _storeAddressController
                                                               .text,
                                                           _storePhoneNumberController
                                                               .text);
-                                                      if (mounted)
-                                                        Navigator.of(context)
-                                                            .pop();
+                                                      if (!mounted) return;
+                                                      // buildAlertSnackBar(
+                                                      //     context,
+                                                      //     "Berhasil menambahkan toko baru.");
+                                                      Navigator.of(context)
+                                                          .pop();
                                                     }
                                                   },
                                                   child: const Text("Tambah")),
@@ -217,9 +220,17 @@ class _ChooseStoreState extends State<ChooseStore> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    widget.pageController.previousPage(
-                        duration: Duration(milliseconds: 200),
-                        curve: Curves.easeIn);
+                    // widget.pageController.previousPage(
+                    //     duration: Duration(milliseconds: 200),
+                    //     curve: Curves.easeIn);
+                    showConfirmationDialog(
+                        context: context,
+                        text: "Yakin ingin membatalkan transaksi?",
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        });
+
                     salesController.currentStep.value =
                         widget.pageController.page!.round();
                   },

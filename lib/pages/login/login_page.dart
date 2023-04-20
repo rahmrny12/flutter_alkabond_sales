@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
-import 'package:flutter_alkabond_sales/helper/alert_snackbar.dart';
+import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/model/user_model.dart';
 import 'package:flutter_alkabond_sales/pages/dashboard/dashboard_page.dart';
 import 'package:flutter_alkabond_sales/pages/home/home_controller.dart';
@@ -35,8 +35,10 @@ class _LoginPageState extends State<LoginPage> {
         'email': usernameController.text,
         'password': passwordController.text,
       });
+      print(response.body);
       if (response.statusCode == 200) {
         UserModel user = userModelFromJson(response.body);
+        print(response.body);
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('login_token', user.accessToken);
         prefs.setInt('id', user.data.id);
@@ -50,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
         log(response.body);
       }
     } catch (e) {
+      buildAlertSnackBar(context, "Terjadi masalah. Error : $e");
       log("Error : $e");
     } finally {
       controller.updateIsLoading(false);

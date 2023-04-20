@@ -3,10 +3,12 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/model/product_model.dart';
 import 'package:flutter_alkabond_sales/model/store_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/model/type_model.dart';
+import 'package:flutter_alkabond_sales/pages/success_page.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -83,6 +85,7 @@ class SalesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchProductTypes();
     fetchProductsByType();
   }
 
@@ -93,7 +96,6 @@ class SalesController extends GetxController {
 
   Future<List<StoreModel>> fetchStores() async {
     try {
-      isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       http.Response response =
           await http.get(Uri.parse("$baseUrl/api/stores/"), headers: {
@@ -110,15 +112,12 @@ class SalesController extends GetxController {
       }
     } on Exception catch (e) {
       log(e.toString());
-    } finally {
-      isLoading(false);
     }
     return stores;
   }
 
-  Future<StoreModel?> addStore(
+  Future<void> addStore(
       String storeName, String address, String storeNumber) async {
-    StoreModel? store;
     try {
       isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -135,18 +134,16 @@ class SalesController extends GetxController {
                 'store_number': storeNumber,
               }));
       if (response.statusCode == 200) {
-        var storeJson = jsonDecode(response.body);
-        store = StoreModel.fromJson(storeJson['data']);
-        log(store.storeName);
+        // var storeJson = jsonDecode(response.body);
+        // store = StoreModel.fromJson(storeJson['data']);
+        print(response.body);
       } else {
         log(response.body);
       }
     } on Exception catch (e) {
       log(e.toString());
-    } finally {
-      isLoading(false);
     }
-    return store;
+    isLoading(false);
   }
 
   Future<List<TypeModel>> fetchProductTypes() async {
@@ -161,6 +158,8 @@ class SalesController extends GetxController {
       if (response.statusCode == 200) {
         var productJson = response.body;
         productTypes = typeFromJson(productJson);
+        selectedProductType.value = productTypes[0];
+        update();
       } else {
         log(response.body);
       }
@@ -173,6 +172,7 @@ class SalesController extends GetxController {
   void fetchProductsByType({
     TypeModel? productType,
   }) async {
+    isLoading(true);
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       http.Response response = await http.get(
@@ -193,9 +193,10 @@ class SalesController extends GetxController {
     } on Exception catch (e) {
       log(e.toString());
     }
+    isLoading(false);
   }
 
-  Future<void> checkoutOrder() async {
+  Future<void> checkoutOrder(BuildContext context, bool mounted) async {
     Map<String, dynamic> products = {};
     selectedProductList.asMap().forEach((index, item) {
       ProductModel product = item['product'];
@@ -225,7 +226,15 @@ class SalesController extends GetxController {
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {
         var transaction = TransactionModel.fromJson(json['data']);
-        print(transaction.toString());
+        if (!mounted) return;
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const SuccessPage(successType: SuccessType.transaction),
+            ));
       } else {
         log(response.body);
       }
