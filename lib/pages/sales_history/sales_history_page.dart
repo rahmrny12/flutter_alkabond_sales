@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 
 enum HistoryType {
   process,
-  onsent,
+  sent,
   tempo,
   done,
 }
@@ -67,7 +67,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
           return TabBarView(
             children: [
               buildProcessHistory(salesHistoryController, context),
-              buildOnSentHistory(salesHistoryController, context),
+              buildSentHistory(salesHistoryController, context),
               buildTempoHistory(salesHistoryController, context),
               buildDoneHistory(salesHistoryController, context),
             ],
@@ -131,10 +131,10 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
     );
   }
 
-  Widget buildOnSentHistory(
+  Widget buildSentHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
     return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(HistoryType.onsent.name),
+      future: salesHistoryController.fetchTransactions(HistoryType.sent.name),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done) {
           List<TransactionModel>? transactions = snap.data;
@@ -142,7 +142,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
             return ListView.builder(
               itemCount: transactions.length,
               itemBuilder: (context, index) {
-                return buildHistoryCard(context, HistoryType.onsent,
+                return buildHistoryCard(context, HistoryType.sent,
                     transactions[index], salesHistoryController);
               },
             );
@@ -334,7 +334,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                                   fontWeight: FontWeight.w400),
                           children: [
                             TextSpan(
-                                text: "Rp 36.000",
+                                text: parseToRupiah(transaction.grandTotal),
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     color:
@@ -363,67 +363,67 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                 ),
               ),
             ),
-            if (type == HistoryType.onsent)
-              if (transaction.deliveryStatus != "sent")
-                buildOrderReceivedButton(
-                    context, transaction, salesHistoryController)
+            // if (type == HistoryType.sent)
+            //   if (transaction.deliveryStatus != "sent")
+            //     buildOrderReceivedButton(
+            //         context, transaction, salesHistoryController)
           ],
         ),
       ),
     );
   }
 
-  Container buildOrderReceivedButton(
-      BuildContext context,
-      TransactionModel transaction,
-      SalesHistoryController salesHistoryController) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.fromLTRB(CustomPadding.smallPadding, 0,
-          CustomPadding.smallPadding, CustomPadding.smallPadding),
-      child: ElevatedButton(
-        onPressed: () async {
-          buildLoadingDialog(context);
-          var result = await salesHistoryController.confirmDeliverySuccess(
-              context, transaction.id);
-          if (!mounted) return;
-          Navigator.pop(context);
-          if (result) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => SalesHistoryPage()));
-          } else {
-            if (!mounted) return;
-            buildAlertSnackBar(context, "Terjadi masalah. Coba lagi nanti.");
-          }
-        },
-        style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.onPrimary,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                    width: 2, color: Theme.of(context).colorScheme.primary))),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Pesanan Diterima",
-                style: Theme.of(context).textTheme.headline5!.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    )),
-            // if (transaction.deliveryStatus == "sent")
-            //   Padding(
-            //     padding: EdgeInsets.only(left: CustomPadding.extraSmallPadding),
-            //     child: Icon(
-            //       Icons.check_circle,
-            //       color: Theme.of(context).colorScheme.onPrimary,
-            //     ),
-            //   )
-          ],
-        ),
-      ),
-    );
-  }
+  // Container buildOrderReceivedButton(
+  //     BuildContext context,
+  //     TransactionModel transaction,
+  //     SalesHistoryController salesHistoryController) {
+  //   return Container(
+  //     width: MediaQuery.of(context).size.width,
+  //     margin: EdgeInsets.fromLTRB(CustomPadding.smallPadding, 0,
+  //         CustomPadding.smallPadding, CustomPadding.smallPadding),
+  //     child: ElevatedButton(
+  //       onPressed: () async {
+  //         buildLoadingDialog(context);
+  //         var result = await salesHistoryController.confirmDeliverySuccess(
+  //             context, transaction.id);
+  //         if (!mounted) return;
+  //         Navigator.pop(context);
+  //         if (result) {
+  //           Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (BuildContext context) => SalesHistoryPage()));
+  //         } else {
+  //           if (!mounted) return;
+  //           buildAlertSnackBar(context, "Terjadi masalah. Coba lagi nanti.");
+  //         }
+  //       },
+  //       style: ElevatedButton.styleFrom(
+  //           backgroundColor: Theme.of(context).colorScheme.onPrimary,
+  //           shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(20),
+  //               side: BorderSide(
+  //                   width: 2, color: Theme.of(context).colorScheme.primary))),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           Text("Pesanan Diterima",
+  //               style: Theme.of(context).textTheme.headline5!.copyWith(
+  //                     color: Theme.of(context).colorScheme.primary,
+  //                   )),
+  //           // if (transaction.deliveryStatus == "sent")
+  //           //   Padding(
+  //           //     padding: EdgeInsets.only(left: CustomPadding.extraSmallPadding),
+  //           //     child: Icon(
+  //           //       Icons.check_circle,
+  //           //       color: Theme.of(context).colorScheme.onPrimary,
+  //           //     ),
+  //           //   )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   bool get wantKeepAlive => false;

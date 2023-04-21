@@ -17,6 +17,8 @@ import '../../constant.dart';
 
 class SalesController extends GetxController {
   var currentStep = 0.obs;
+  var errorMessage = "".obs;
+  var successMessage = "".obs;
   List<StoreModel> stores = <StoreModel>[].obs;
   List<ProductModel> products = <ProductModel>[].obs;
   List<TypeModel> productTypes = <TypeModel>[].obs;
@@ -116,8 +118,8 @@ class SalesController extends GetxController {
     return stores;
   }
 
-  Future<void> addStore(
-      String storeName, String address, String storeNumber) async {
+  Future<void> addStore(BuildContext context, bool mounted, String storeName,
+      String address, String storeNumber) async {
     try {
       isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -133,12 +135,14 @@ class SalesController extends GetxController {
                 'address': address,
                 'store_number': storeNumber,
               }));
-      if (response.statusCode == 200) {
-        // var storeJson = jsonDecode(response.body);
-        // store = StoreModel.fromJson(storeJson['data']);
-        print(response.body);
+      var json = jsonDecode(response.body);
+      if (response.statusCode == 200 && json['status_code'] == 200) {
+        var storeJson = jsonDecode(response.body);
+        var store = StoreModel.fromJson(storeJson['data']);
+        successMessage.value = "Berhasil menambahkan toko : ${store.storeName}";
       } else {
         log(response.body);
+        errorMessage.value = json['message'].toString();
       }
     } on Exception catch (e) {
       log(e.toString());
@@ -225,7 +229,7 @@ class SalesController extends GetxController {
               }));
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {
-        var transaction = TransactionModel.fromJson(json['data']);
+        // var transaction = TransactionModel.fromJson(json['data']);
         if (!mounted) return;
         Navigator.pop(context);
         Navigator.pop(context);
@@ -236,6 +240,10 @@ class SalesController extends GetxController {
                   const SuccessPage(successType: SuccessType.transaction),
             ));
       } else {
+        if (!mounted) return;
+        Navigator.pop(context);
+        buildAlertSnackBar(
+            context, "Terjadi masalah. Error : ${response.body}");
         log(response.body);
       }
     } on Exception catch (e) {

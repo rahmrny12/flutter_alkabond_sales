@@ -16,6 +16,7 @@ class PaymentController extends GetxController {
 
   Future<dynamic> storePayment(
       {required int transactionId,
+      required String totalPay,
       required BuildContext context,
       required bool mounted}) async {
     try {
@@ -28,7 +29,7 @@ class PaymentController extends GetxController {
                 'Authorization': 'Bearer ${prefs.getString('login_token')!}',
               },
               body: jsonEncode({
-                "total_pay": totalPay.value,
+                "total_pay": totalPay,
               }));
       if (response.statusCode == 200) {
         var json = jsonDecode(response.body);

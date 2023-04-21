@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
-const String baseUrl = 'https://2d04-125-166-116-48.ngrok-free.app';
-// const String baseUrl = 'http://10.0.2.2:8000';
+// const String baseUrl = 'https://dc43-36-74-217-213.ngrok-free.app';
+const String baseUrl = 'http://10.0.2.2:8000';
 // pak rete
 // const String baseUrl = 'http://192.168.0.110:8080';
 // redmi 7a

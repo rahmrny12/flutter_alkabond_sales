@@ -88,8 +88,17 @@ class _SalesPageState extends State<SalesPage> {
               physics: const NeverScrollableScrollPhysics(),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               steps: 3,
+              iconColor: Theme.of(context).colorScheme.secondary,
+              activeLineColor: Theme.of(context).colorScheme.secondary,
+              activeNodeColor: Theme.of(context).colorScheme.secondary,
+              activeLabelStyle: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Theme.of(context).colorScheme.secondary),
+              inActiveLabelStyle: Theme.of(context).textTheme.headline6,
+              activeBorderColor: Theme.of(context).colorScheme.secondary,
               indicatorPosition: IndicatorPosition.top,
-              labels: ['Toko', 'Checkout', 'Detail'],
+              labels: const ['Toko', 'Checkout', 'Detail'],
               controller: _pageController,
               children: [
                 ChooseStore(pageController: _pageController),

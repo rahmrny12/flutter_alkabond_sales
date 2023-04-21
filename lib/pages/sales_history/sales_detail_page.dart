@@ -10,6 +10,7 @@ import 'package:flutter_alkabond_sales/model/product_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_detail_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/pages/payment/pay_tempo_page.dart';
+import 'package:flutter_alkabond_sales/pages/payment/return_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_controller.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_page.dart';
 import 'package:get/get.dart';
@@ -42,78 +43,284 @@ class _SalesDetailState extends State<SalesDetail> {
               if (snap.connectionState == ConnectionState.done) {
                 TransactionModel? transaction = snap.data;
                 if (transaction != null) {
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(
-                                  bottom: CustomPadding.extraSmallPadding),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: CustomPadding.mediumPadding,
-                                  vertical: CustomPadding.smallPadding),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: CustomPadding.mediumPadding,
+                              horizontal: CustomPadding.largePadding),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.background,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                    (widget.type == HistoryType.process)
+                                        ? "Pesanan sedang di proses"
+                                        : (widget.type == HistoryType.sent)
+                                            ? "Pesanan sedang dikirim ke alamat toko tujuan"
+                                            : (widget.type == HistoryType.tempo)
+                                                ? "Pesanan sedang dalam cicilan"
+                                                : "Pesanan telah selesai",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline5!
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary)),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
+                              SizedBox(width: CustomPadding.mediumPadding),
+                              Image.asset((widget.type == HistoryType.process)
+                                  ? "$imagePath/onprocess.png"
+                                  : (widget.type == HistoryType.sent)
+                                      ? "$imagePath/onsent.png"
+                                      : (widget.type == HistoryType.tempo)
+                                          ? "$imagePath/ontempo.png"
+                                          : "$imagePath/done.png")
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              bottom: CustomPadding.extraSmallPadding),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomPadding.mediumPadding,
+                              vertical: CustomPadding.smallPadding),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset("$imagePath/icon/location.png"),
+                              SizedBox(width: CustomPadding.smallPadding),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Image.asset("$imagePath/icon/location.png"),
-                                  SizedBox(width: CustomPadding.smallPadding),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Alamat Toko",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary)),
-                                      SizedBox(
-                                          height:
-                                              CustomPadding.extraSmallPadding),
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.7,
-                                        child: Text(transaction.address,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6!
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSecondary)),
-                                      ),
-                                    ],
+                                  Text("Alamat Toko",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary)),
+                                  SizedBox(
+                                      height: CustomPadding.extraSmallPadding),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: Text(
+                                        "${transaction.storeName} - ${transaction.address}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary)),
                                   ),
                                 ],
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  bottom: CustomPadding.extraSmallPadding),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: CustomPadding.mediumPadding,
-                                  vertical: CustomPadding.smallPadding),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
-                              child: Row(
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              bottom: CustomPadding.extraSmallPadding),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomPadding.mediumPadding,
+                              vertical: CustomPadding.smallPadding),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset("$imagePath/icon/user.png"),
+                              SizedBox(width: CustomPadding.smallPadding),
+                              Text("Sales : ${transaction.salesName}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary)),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              bottom: CustomPadding.extraSmallPadding),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomPadding.mediumPadding,
+                              vertical: CustomPadding.smallPadding),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset("$imagePath/icon/edit.png"),
+                              SizedBox(width: CustomPadding.smallPadding),
+                              Column(
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Image.asset("$imagePath/icon/user.png"),
+                                  Text("Rincian Pemesanan",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary)),
+                                  SizedBox(
+                                      height: CustomPadding.extraSmallPadding),
+                                  SizedBox(height: CustomPadding.smallPadding),
+                                  ...List.generate(
+                                      transaction.transactionDetails.length,
+                                      (index) => buildDetailProductCard(
+                                          context,
+                                          transaction.transactionDetails[index],
+                                          transaction.deliveryStatus,
+                                          transaction.status))
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: CustomPadding.smallPadding),
+                        Container(
+                          margin: EdgeInsets.only(
+                              bottom: CustomPadding.extraSmallPadding),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomPadding.mediumPadding,
+                              vertical: CustomPadding.smallPadding),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: CustomPadding.smallPadding),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            width: 2,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface))),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Image.asset(
+                                        "$imagePath/icon/credit-card.png"),
+                                    SizedBox(width: CustomPadding.smallPadding),
+                                    Text(
+                                        "Metode pembayaran : ${transaction.paymentMethod ?? '-'}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: CustomPadding.smallPadding),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            width: 2,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface))),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Image.asset(
+                                        "$imagePath/icon/credit-card.png"),
+                                    SizedBox(width: CustomPadding.smallPadding),
+                                    Text(
+                                        "Status pembayaran : ${transaction.status}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: CustomPadding.smallPadding),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            width: 2,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface))),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Image.asset(
+                                        "$imagePath/icon/credit-card.png"),
+                                    SizedBox(width: CustomPadding.smallPadding),
+                                    Text(
+                                        "Status Pengiriman : ${transaction.deliveryStatus}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: CustomPadding.smallPadding),
+                        Container(
+                          margin: EdgeInsets.only(
+                              bottom: CustomPadding.extraSmallPadding),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomPadding.mediumPadding,
+                              vertical: CustomPadding.smallPadding),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset("$imagePath/icon/file-text.png"),
                                   SizedBox(width: CustomPadding.smallPadding),
-                                  Text("Sales : ${transaction.salesName}",
+                                  Text("Rincian Pembayaran",
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline6!
@@ -123,284 +330,142 @@ class _SalesDetailState extends State<SalesDetail> {
                                                   .onSecondary)),
                                 ],
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  bottom: CustomPadding.extraSmallPadding),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: CustomPadding.mediumPadding,
-                                  vertical: CustomPadding.smallPadding),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.asset("$imagePath/icon/edit.png"),
-                                  SizedBox(width: CustomPadding.smallPadding),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Rincian Pemesanan",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary)),
-                                      SizedBox(
-                                          height:
-                                              CustomPadding.extraSmallPadding),
-                                      SizedBox(
-                                          height: CustomPadding.smallPadding),
-                                      ...List.generate(
-                                          transaction.transactionDetails.length,
-                                          (index) => buildDetailProductCard(
-                                              context,
-                                              transaction
-                                                  .transactionDetails[index]))
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  bottom: CustomPadding.extraSmallPadding),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: CustomPadding.mediumPadding,
-                                  vertical: CustomPadding.smallPadding),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Image.asset(
-                                          "$imagePath/icon/file-text.png"),
-                                      SizedBox(
-                                          width: CustomPadding.smallPadding),
-                                      Text("Rincian Pembayaran",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6!
-                                              .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary)),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                      height: CustomPadding.extraSmallPadding),
-                                  Column(
-                                    children: [
-                                      ...List.generate(
-                                          transaction.transactionDetails.length,
-                                          (index) => buildSubtotal(
-                                              context,
-                                              transaction
-                                                  .transactionDetails[index])),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: CustomPadding
-                                                .extraSmallPadding),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.6,
-                                              child: Text("Total Pembayaran",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline6!
-                                                      .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onSecondary)),
-                                            ),
-                                            Text(
-                                                parseToRupiah(
-                                                    transaction.grandTotal),
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .primary)),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: CustomPadding.smallPadding),
-                            if (widget.type.name != "process")
+                              SizedBox(height: CustomPadding.extraSmallPadding),
                               Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  ...List.generate(
+                                      transaction.transactionDetails.length,
+                                      (index) => buildSubtotal(
+                                          context,
+                                          transaction
+                                              .transactionDetails[index])),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: CustomPadding.largePadding),
-                                    child: ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PayTempoPage(
-                                                          transactionId: widget
-                                                              .transactionId)));
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .surface,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: CustomPadding
-                                                    .smallPadding)),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Cicilan Barang",
+                                        vertical:
+                                            CustomPadding.extraSmallPadding),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.6,
+                                          child: Text("Total Pembayaran",
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .headline5!
+                                                  .headline6!
                                                   .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700,
                                                       color: Theme.of(context)
                                                           .colorScheme
-                                                          .onSecondary),
-                                            ),
-                                            SizedBox(
-                                                width: CustomPadding
-                                                    .extraSmallPadding),
-                                            Image.asset(
-                                                "$imagePath/icon/file-text.png"),
-                                          ],
-                                        )),
-                                  ),
-                                  SizedBox(
-                                      height: CustomPadding.extraSmallPadding),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: CustomPadding.largePadding),
-                                    child: ElevatedButton(
-                                        onPressed: () {
-                                          Get.toNamed("/return");
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .surface,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: CustomPadding
-                                                    .smallPadding)),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Return",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline5!
-                                                  .copyWith(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSecondary),
-                                            ),
-                                            SizedBox(
-                                                width: CustomPadding
-                                                    .extraSmallPadding),
-                                            Icon(Icons.refresh,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary),
-                                          ],
-                                        )),
-                                  ),
-                                  SizedBox(
-                                      height: CustomPadding.extraLargePadding),
+                                                          .onSecondary)),
+                                        ),
+                                        Text(
+                                            parseToRupiah(
+                                                transaction.grandTotal),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline6!
+                                                .copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .primary)),
+                                      ],
+                                    ),
+                                  )
                                 ],
                               ),
-                            SizedBox(height: CustomPadding.mediumPadding),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      if (widget.type.name == "onsent" ||
-                          widget.type.name == "tempo")
-                        Positioned(
-                          bottom: 0,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            color: Theme.of(context).colorScheme.primary,
+                        SizedBox(height: CustomPadding.smallPadding),
+                        if (widget.type.name != "process")
+                          Padding(
                             padding: EdgeInsets.symmetric(
-                                horizontal: CustomPadding.mediumPadding,
-                                vertical: CustomPadding.extraSmallPadding),
-                            child: (transaction.deliveryStatus == "sent")
-                                ? const SizedBox()
-                                : ElevatedButton(
-                                    onPressed: () async {
-                                      buildLoadingDialog(context);
-                                      var result = await salesHistoryController
-                                          .confirmDeliverySuccess(
-                                              context, transaction.id);
-                                      if (!mounted) return;
-                                      Navigator.pop(context);
-                                      if (result) {
-                                        if (!mounted) return;
-                                        Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (BuildContext
-                                                        context) =>
-                                                    SalesDetail(
-                                                        type: widget.type,
-                                                        transactionId: widget
-                                                            .transactionId)));
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
-                                        padding: EdgeInsets.symmetric(
-                                            vertical:
-                                                CustomPadding.smallPadding)),
-                                    child: Text(
-                                      "Pesanan Diterima",
+                                horizontal: CustomPadding.largePadding),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PayTempoPage(
+                                                transactionId:
+                                                    widget.transactionId,
+                                                type: widget.type,
+                                                payments: transaction.payments,
+                                              )));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: CustomPadding.smallPadding)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Cicilan Barang",
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline5!
                                           .copyWith(
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .primary),
-                                    )),
+                                                  .onSecondary),
+                                    ),
+                                    SizedBox(
+                                        width: CustomPadding.extraSmallPadding),
+                                    Image.asset(
+                                        "$imagePath/icon/file-text.png"),
+                                  ],
+                                )),
                           ),
-                        )
-                    ],
+                        // SizedBox(height: CustomPadding.extraSmallPadding),
+                        // Padding(
+                        //   padding: EdgeInsets.symmetric(
+                        //       horizontal: CustomPadding.largePadding),
+                        //   child: ElevatedButton(
+                        //       onPressed: () {
+                        //         Get.toNamed("/return");
+                        //       },
+                        //       style: ElevatedButton.styleFrom(
+                        //           backgroundColor: Theme.of(context)
+                        //               .colorScheme
+                        //               .surface,
+                        //           padding: EdgeInsets.symmetric(
+                        //               vertical:
+                        //                   CustomPadding.smallPadding)),
+                        //       child: Row(
+                        //         mainAxisAlignment:
+                        //             MainAxisAlignment.center,
+                        //         children: [
+                        //           Text(
+                        //             "Return",
+                        //             style: Theme.of(context)
+                        //                 .textTheme
+                        //                 .headline5!
+                        //                 .copyWith(
+                        //                     color: Theme.of(context)
+                        //                         .colorScheme
+                        //                         .onSecondary),
+                        //           ),
+                        //           SizedBox(
+                        //               width: CustomPadding
+                        //                   .extraSmallPadding),
+                        //           Icon(Icons.refresh,
+                        //               color: Theme.of(context)
+                        //                   .colorScheme
+                        //                   .primary),
+                        //         ],
+                        //       )),
+                        // ),ustomPadding.mediumPadding),
+                        SizedBox(height: CustomPadding.extraLargePadding),
+                      ],
+                    ),
                   );
                 } else {
                   return Center(
@@ -476,8 +541,8 @@ class _SalesDetailState extends State<SalesDetail> {
     );
   }
 
-  Widget buildDetailProductCard(
-      BuildContext context, TransactionDetail product) {
+  Widget buildDetailProductCard(BuildContext context, TransactionDetail detail,
+      String deliveryStatus, String paymentStatus) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.7,
       padding: EdgeInsets.only(bottom: CustomPadding.smallPadding),
@@ -490,7 +555,7 @@ class _SalesDetailState extends State<SalesDetail> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            product.productCode,
+            detail.productCode,
             style: Theme.of(context)
                 .textTheme
                 .headline6!
@@ -498,7 +563,7 @@ class _SalesDetailState extends State<SalesDetail> {
           ),
           SizedBox(height: CustomPadding.extraSmallPadding),
           Text(
-            "${product.productName} - ${product.productBrand} - ${product.unitWeight}",
+            "${detail.productName} - ${detail.productBrand} - ${detail.unitWeight}",
             style: Theme.of(context)
                 .textTheme
                 .headline6!
@@ -506,7 +571,7 @@ class _SalesDetailState extends State<SalesDetail> {
           ),
           SizedBox(height: CustomPadding.extraSmallPadding),
           Text(
-            "Jumlah : ${product.quantity}x",
+            "Jumlah : ${detail.quantity}x",
             style: Theme.of(context)
                 .textTheme
                 .headline6!
@@ -514,12 +579,24 @@ class _SalesDetailState extends State<SalesDetail> {
           ),
           SizedBox(height: CustomPadding.extraSmallPadding),
           Text(
-            "Harga : ${parseToRupiah(product.price)}",
+            "Harga : ${parseToRupiah(detail.price)}",
             style: Theme.of(context)
                 .textTheme
                 .headline6!
                 .copyWith(color: Theme.of(context).colorScheme.onSecondary),
           ),
+          if (deliveryStatus == "sent" && paymentStatus != "paid")
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReturnPage(
+                          transactionDetailId: detail.id,
+                        ),
+                      ));
+                },
+                child: Text("Return"))
         ],
       ),
     );

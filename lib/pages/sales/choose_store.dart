@@ -65,10 +65,11 @@ class _ChooseStoreState extends State<ChooseStore> {
                             // showSearchBox: true,
                           ),
                           compareFn: (item1, item2) => item1.isEqual(item2),
-                          filterFn: (item, filter) =>
-                              item.storeFilterByName(filter),
+                          // filterFn: (item, filter) =>
+                          //     item.storeFilterByName(filter),
                           asyncItems: (text) => salesController.fetchStores(),
-                          itemAsString: (item) => item.storeName,
+                          itemAsString: (store) =>
+                              "${store.storeName} - ${store.address}",
                           dropdownDecoratorProps: DropDownDecoratorProps(
                             baseStyle: Theme.of(context)
                                 .textTheme
@@ -89,7 +90,10 @@ class _ChooseStoreState extends State<ChooseStore> {
                             return Padding(
                               padding: EdgeInsets.only(
                                   top: CustomPadding.extraSmallPadding),
-                              child: Text(store == null ? "-" : store.storeName,
+                              child: Text(
+                                  store == null
+                                      ? "-"
+                                      : "${store.storeName} - ${store.address}",
                                   style: Theme.of(context).textTheme.headline5),
                             );
                           },
@@ -181,7 +185,9 @@ class _ChooseStoreState extends State<ChooseStore> {
                                                     if (_formAddStoreKey
                                                         .currentState!
                                                         .validate()) {
-                                                      await salesController.addStore(
+                                                      var result = await salesController.addStore(
+                                                          context,
+                                                          mounted,
                                                           _storeNameController
                                                               .text,
                                                           _storeAddressController
@@ -189,9 +195,6 @@ class _ChooseStoreState extends State<ChooseStore> {
                                                           _storePhoneNumberController
                                                               .text);
                                                       if (!mounted) return;
-                                                      // buildAlertSnackBar(
-                                                      //     context,
-                                                      //     "Berhasil menambahkan toko baru.");
                                                       Navigator.of(context)
                                                           .pop();
                                                     }
@@ -207,7 +210,42 @@ class _ChooseStoreState extends State<ChooseStore> {
                               },
                             );
                           },
-                          child: const Text("Tambah Toko")),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onSecondary,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.add),
+                              SizedBox(
+                                width: CustomPadding.smallPadding,
+                              ),
+                              Text(
+                                "Tambah Toko",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary),
+                              ),
+                            ],
+                          )),
+                      SizedBox(height: CustomPadding.mediumPadding),
+                      Text(
+                        (salesController.errorMessage.value.isNotEmpty)
+                            ? salesController.errorMessage.value
+                            : (salesController.successMessage.value.isNotEmpty)
+                                ? salesController.successMessage.value
+                                : "",
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                            fontWeight: FontWeight.w400,
+                            color: Theme.of(context).colorScheme.secondary),
+                      ),
                     ],
                   ),
           ),
@@ -291,6 +329,10 @@ class _ChooseStoreState extends State<ChooseStore> {
                   fontWeight: FontWeight.w400)),
           SizedBox(height: CustomPadding.smallPadding / 2),
           TextFormField(
+            keyboardType: (label.toLowerCase() == "nomer hp")
+                ? TextInputType.number
+                : TextInputType.text,
+            textInputAction: TextInputAction.next,
             controller: controller,
             validator: (value) {
               if (value == null || value.isEmpty) {

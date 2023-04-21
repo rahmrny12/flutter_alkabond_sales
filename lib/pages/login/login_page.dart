@@ -35,20 +35,21 @@ class _LoginPageState extends State<LoginPage> {
         'email': usernameController.text,
         'password': passwordController.text,
       });
-      print(response.body);
-      if (response.statusCode == 200) {
+      var json = jsonDecode(response.body);
+      // ignore: unrelated_type_equality_checks
+      if (response.statusCode == 200 && json['status_code'] == 200) {
         UserModel user = userModelFromJson(response.body);
-        print(response.body);
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('login_token', user.accessToken);
         prefs.setInt('id', user.data.id);
         prefs.setString('username', user.data.username);
+        prefs.setString('email', user.data.email);
         prefs.setString('name', user.data.salesName);
         Get.toNamed('/home');
       } else {
         if (!mounted) return;
-        buildAlertSnackBar(context,
-            "Login gagal. Pesan : ${jsonDecode(response.body)['message']}");
+        buildAlertSnackBar(
+            context, "Login gagal. Cek kembali username dan password Anda");
         log(response.body);
       }
     } catch (e) {
@@ -78,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Column(
                     children: [
-                      Spacer(),
+                      Spacer(flex: 2),
                       Image.asset(
                         "$imagePath/logo.png",
                         width: 150,
@@ -121,49 +122,51 @@ class _LoginPageState extends State<LoginPage> {
                                 context: context,
                                 hint: "Masukkan username...",
                                 controller: usernameController,
+                                icon: "$imagePath/icon/username.png",
                                 isPassword: false),
                             buildLoginInput(
                                 context: context,
                                 hint: "Masukkan password...",
                                 controller: passwordController,
+                                icon: "$imagePath/icon/password.png",
                                 isPassword: true),
                             GetBuilder<LoginController>(builder: (controller) {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 36),
-                                child: ElevatedButton(
-                                  onPressed: controller.isDataLoading.value
-                                      ? null
-                                      : () {
-                                          loginUser(context);
-                                        },
-                                  style: ButtonStyle(
-                                      shape: MaterialStatePropertyAll(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(24))),
-                                      padding: MaterialStatePropertyAll(
-                                          EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 48))),
-                                  child: controller.isDataLoading.value
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text('LOGIN'),
-                                            Container(
-                                              width: 24,
-                                              height: 24,
-                                              padding: const EdgeInsets.all(2),
-                                              margin: const EdgeInsets.only(
-                                                  left: 12),
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 3,
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      : Text('LOGIN'),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (controller.isDataLoading.value)
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            bottom:
+                                                CustomPadding.mediumPadding),
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ElevatedButton(
+                                      onPressed: controller.isDataLoading.value
+                                          ? null
+                                          : () {
+                                              loginUser(context);
+                                            },
+                                      style: ButtonStyle(
+                                          shape: MaterialStatePropertyAll(
+                                              RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          24))),
+                                          padding: MaterialStatePropertyAll(
+                                              EdgeInsets.symmetric(
+                                                  vertical: 12,
+                                                  horizontal: 48))),
+                                      child: Text(
+                                        'LOGIN',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               );
                             })
@@ -182,23 +185,38 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  TextField buildLoginInput(
+  Widget buildLoginInput(
       {required BuildContext context,
       required String hint,
       required TextEditingController controller,
+      required String icon,
       required bool isPassword}) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      style: TextStyle(
-        color: Theme.of(context).colorScheme.onPrimary,
+    return Padding(
+      padding: EdgeInsets.all(8.0),
+      child: TextField(
+        textInputAction:
+            (isPassword) ? TextInputAction.done : TextInputAction.next,
+        controller: controller,
+        obscureText: isPassword,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
+        decoration: InputDecoration(
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.onBackground,
+            prefixIcon: Image.asset(
+              icon,
+              height: 16,
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(style: BorderStyle.none),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            hintText: hint,
+            hintStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary,
+            )),
       ),
-      decoration: InputDecoration(
-          fillColor: Theme.of(context).colorScheme.background,
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onBackground,
-          )),
     );
   }
 }

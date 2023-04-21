@@ -10,6 +10,7 @@ import 'package:flutter_alkabond_sales/pages/login/login_page.dart';
 import 'package:flutter_alkabond_sales/pages/payment/pay_tempo_page.dart';
 import 'package:flutter_alkabond_sales/pages/payment/return_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_binding.dart';
+import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_detail_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_binding.dart';
@@ -21,7 +22,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  var email = prefs.getString('login_token');
+  var email = prefs.getString('email');
+
+  SalesController controller = Get.put(SalesController());
+  var checkToken = await controller.fetchStores();
+  if (checkToken.isEmpty) {
+    email == null;
+  }
 
   runApp(MyApp(email: email));
 }
@@ -69,10 +76,10 @@ class MyApp extends StatelessWidget {
         //   name: '/sales-detail',
         //   page: () => const SalesDetail(),
         // ),
-        GetPage(
-          name: '/return',
-          page: () => const ReturnPage(),
-        ),
+        // GetPage(
+        //   name: '/return',
+        //   page: () => const ReturnPage(),
+        // ),
       ],
     );
   }

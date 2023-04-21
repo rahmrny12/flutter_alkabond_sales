@@ -243,7 +243,10 @@ class ChooseProducts extends StatelessWidget {
                         },
                       );
                     },
-                    child: const Text("Tambah Produk"))),
+                    child: Text(
+                      "Tambah Produk",
+                      style: Theme.of(context).textTheme.headline6,
+                    ))),
             ...List.generate(
               salesController.selectedProductList.length,
               (index) => buildProductCard(
@@ -251,6 +254,21 @@ class ChooseProducts extends StatelessWidget {
             ),
             if (salesController.selectedProductList.isNotEmpty)
               buildTotalPaymentCard(context, salesController),
+            if (salesController.selectedProductList.isEmpty)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: CustomPadding.extraLargePadding),
+                  Image.asset(
+                    "$imagePath/product-empty.png",
+                    width: MediaQuery.of(context).size.width * 0.4,
+                  ),
+                  SizedBox(height: CustomPadding.mediumPadding),
+                  Text("Belum ada produk",
+                      style: Theme.of(context).textTheme.headline5),
+                  SizedBox(height: CustomPadding.extraLargePadding),
+                ],
+              ),
             SizedBox(height: CustomPadding.mediumPadding),
             Padding(
               padding: EdgeInsets.only(bottom: CustomPadding.largePadding),

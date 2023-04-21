@@ -7,7 +7,9 @@ import 'package:flutter_alkabond_sales/pages/payment/payment_controller.dart';
 import 'package:get/get.dart';
 
 class ReturnPage extends StatefulWidget {
-  const ReturnPage({super.key});
+  const ReturnPage({super.key, required this.transactionDetailId});
+
+  final int transactionDetailId;
 
   @override
   State<ReturnPage> createState() => _ReturnPageState();
@@ -125,7 +127,7 @@ class _ReturnPageState extends State<ReturnPage> {
                       if (addReturnFormKey.currentState!.validate()) {
                         buildLoadingDialog(context);
                         await paymentController.productReturn(
-                            transactionDetailId: 7,
+                            transactionDetailId: widget.transactionDetailId,
                             returnQuantity: quantityController.text,
                             returnDescription: desccriptionController.text,
                             context: context,

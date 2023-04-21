@@ -64,7 +64,7 @@ showConfirmationDialog(
             .copyWith(color: Theme.of(context).colorScheme.primary),
       ));
   Widget continueButton = ElevatedButton(
-    child: Text("Lanjut", style: Theme.of(context).textTheme.headline6),
+    child: Text("Ya", style: Theme.of(context).textTheme.headline6),
     onPressed: onPressed,
   );
   // set up the AlertDialog
