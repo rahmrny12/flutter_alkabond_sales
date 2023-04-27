@@ -10,6 +10,7 @@ import 'package:flutter_alkabond_sales/model/product_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_detail_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/pages/payment/pay_tempo_page.dart';
+import 'package:flutter_alkabond_sales/pages/payment/payment_controller.dart';
 import 'package:flutter_alkabond_sales/pages/payment/return_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_controller.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_page.dart';
@@ -27,6 +28,8 @@ class SalesDetail extends StatefulWidget {
 }
 
 class _SalesDetailState extends State<SalesDetail> {
+  final PaymentController paymentController = Get.put(PaymentController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,6 +190,23 @@ class _SalesDetailState extends State<SalesDetail> {
                                                   .onSecondary)),
                                   SizedBox(
                                       height: CustomPadding.extraSmallPadding),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        textAlign: TextAlign.center,
+                                        transaction.invoiceCode,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary),
+                                      ),
+                                    ],
+                                  ),
                                   SizedBox(height: CustomPadding.smallPadding),
                                   ...List.generate(
                                       transaction.transactionDetails.length,
@@ -255,8 +275,7 @@ class _SalesDetailState extends State<SalesDetail> {
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset(
-                                        "$imagePath/icon/credit-card.png"),
+                                    Image.asset("$imagePath/icon/dollar.png"),
                                     SizedBox(width: CustomPadding.smallPadding),
                                     Text(
                                         "Status pembayaran : ${transaction.status}",
@@ -284,8 +303,7 @@ class _SalesDetailState extends State<SalesDetail> {
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset(
-                                        "$imagePath/icon/credit-card.png"),
+                                    Image.asset("$imagePath/icon/truck.png"),
                                     SizedBox(width: CustomPadding.smallPadding),
                                     Text(
                                         "Status Pengiriman : ${transaction.deliveryStatus}",
@@ -395,6 +413,8 @@ class _SalesDetailState extends State<SalesDetail> {
                                           builder: (context) => PayTempoPage(
                                                 transactionId:
                                                     widget.transactionId,
+                                                remainingPay:
+                                                    transaction.remainingPay,
                                                 type: widget.type,
                                                 payments: transaction.payments,
                                               )));
@@ -586,17 +606,119 @@ class _SalesDetailState extends State<SalesDetail> {
                 .copyWith(color: Theme.of(context).colorScheme.onSecondary),
           ),
           if (deliveryStatus == "sent" && paymentStatus != "paid")
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReturnPage(
-                          transactionDetailId: detail.id,
-                        ),
-                      ));
-                },
-                child: Text("Return"))
+            (detail.returns?.id == null)
+                ? Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: CustomPadding.smallPadding),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReturnPage(
+                                    transactionDetailId: detail.id,
+                                  ),
+                                ));
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.onBackground,
+                              textStyle: Theme.of(context).textTheme.headline6,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: CustomPadding.extraSmallPadding,
+                                  horizontal: CustomPadding.largePadding),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10))),
+                          child: Text("Return")),
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: CustomPadding.mediumPadding),
+                      Text(
+                        "Return",
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ),
+                      Text(
+                        "Keterangan return :",
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ),
+                      Text(
+                        detail.returns?.descriptionReturn ?? "-",
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ),
+                      SizedBox(height: CustomPadding.smallPadding),
+                      Text(
+                        "Jumlah return :",
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ),
+                      Text(
+                        "${detail.returns?.returnsReturn ?? "-"} Barang",
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                            padding: EdgeInsets.only(
+                                top: CustomPadding.smallPadding),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  showConfirmationDialog(
+                                    context: context,
+                                    text: "Yakin ingin membatalkan return?",
+                                    onPressed: () async {
+                                      buildLoadingDialog(context);
+                                      await paymentController.cancelReturn(
+                                          transactionDetailId: detail.id,
+                                          context: context,
+                                          mounted: mounted);
+                                      if (!mounted) return;
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => SalesDetail(
+                                                  type: widget.type,
+                                                  transactionId:
+                                                      widget.transactionId)));
+                                    },
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical:
+                                            CustomPadding.extraSmallPadding,
+                                        horizontal: CustomPadding.largePadding),
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                            width: 2,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onBackground),
+                                        borderRadius:
+                                            BorderRadius.circular(10))),
+                                child: Text(
+                                  "Batal Return",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground),
+                                ))),
+                      )
+                    ],
+                  )
         ],
       ),
     );

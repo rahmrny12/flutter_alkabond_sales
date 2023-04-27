@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void buildAlertSnackBar(BuildContext context, String text) {
-  ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(
-        duration: Duration(seconds: 3),
-        content: Text(text,
-            style: TextStyle(color: Theme.of(context).colorScheme.onSecondary)),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-      ))
-      .closed
-      .then((value) => ScaffoldMessenger.of(context).clearSnackBars());
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    duration: Duration(seconds: 3),
+    content: Text(text,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSecondary)),
+    backgroundColor: Theme.of(context).colorScheme.secondary,
+  ));
+  // .closed
+  // .then((value) => ScaffoldMessenger.of(context).clearSnackBars());
+}
+
+enum MessageType { success, failed }
+
+void buildCustomToast(
+  String text,
+  MessageType type,
+) {
+  Fluttertoast.showToast(
+      msg: text,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: (type == MessageType.success)
+          ? Colors.green.withOpacity(0.6)
+          : Colors.red.withOpacity(0.6),
+      textColor: Colors.white,
+      fontSize: 14);
 }
 
 buildLoadingDialog(BuildContext context) {

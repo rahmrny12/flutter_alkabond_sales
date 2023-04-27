@@ -245,7 +245,8 @@ class ChooseProducts extends StatelessWidget {
                     },
                     child: Text(
                       "Tambah Produk",
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.headline6!.copyWith(
+                          color: Theme.of(context).colorScheme.onSecondary),
                     ))),
             ...List.generate(
               salesController.selectedProductList.length,

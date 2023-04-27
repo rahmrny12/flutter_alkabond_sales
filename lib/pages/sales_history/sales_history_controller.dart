@@ -9,15 +9,23 @@ import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_page.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SalesHistoryController extends GetxController {
   var isLoading = false.obs;
-  var grandTotal = Rxn<int>();
+  var now = DateTime.now();
+  // var grandTotal = Rxn<int>();
+  var storeId = Rxn<int>();
+  // default value
+  var from = Rxn<DateTime>();
+  var to = Rxn<DateTime>();
 
   @override
   void onInit() {
     super.onInit();
+    from.value = now.subtract(const Duration(days: 30));
+    to.value = now;
   }
 
   Future<List<TransactionModel>> fetchTransactions(filter) async {
@@ -25,12 +33,14 @@ class SalesHistoryController extends GetxController {
     try {
       isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      http.Response response = await http
-          .get(Uri.parse("$baseUrl/api/transaction/filter/$filter"), headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ${prefs.getString('login_token')!}',
-      });
+      http.Response response = await http.get(
+          Uri.parse(
+              "$baseUrl/api/transaction/all?filter=$filter&storeId=${storeId.value ?? ''}&from=${(from.value != null) ? DateFormat('yyyy-MM-dd').format(from.value!) : ''}&to=${(to.value != null) ? DateFormat('yyyy-MM-dd').format(to.value!) : ''}"),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${prefs.getString('login_token')!}',
+          });
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {
         transactions = transactionModelFromJson(json['data']);

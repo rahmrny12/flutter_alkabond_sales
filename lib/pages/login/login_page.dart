@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       buildAlertSnackBar(context, "Terjadi masalah. Error : $e");
-      log("Error : $e");
+      log("Login gagal. Error : $e");
     } finally {
       controller.updateIsLoading(false);
     }

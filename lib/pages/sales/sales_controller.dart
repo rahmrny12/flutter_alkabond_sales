@@ -9,6 +9,7 @@ import 'package:flutter_alkabond_sales/model/store_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/model/type_model.dart';
 import 'package:flutter_alkabond_sales/pages/success_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -123,31 +124,30 @@ class SalesController extends GetxController {
     try {
       isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      http.Response response =
-          await http.post(Uri.parse("$baseUrl/api/stores/"),
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': 'Bearer ${prefs.getString('login_token')!}',
-              },
-              body: jsonEncode({
-                'store_name': storeName,
-                'address': address,
-                'store_number': storeNumber,
-              }));
+      http.Response response = await http.post(Uri.parse("$baseUrl/api/stores"),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${prefs.getString('login_token')!}',
+          },
+          body: jsonEncode({
+            'store_name': storeName,
+            'address': address,
+            'store_number': storeNumber,
+          }));
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {
-        var storeJson = jsonDecode(response.body);
-        var store = StoreModel.fromJson(storeJson['data']);
-        successMessage.value = "Berhasil menambahkan toko : ${store.storeName}";
+        var store = StoreModel.fromJson(json['data']);
+        buildCustomToast("Berhasil menambahkan toko : ${store.storeName}",
+            MessageType.success);
       } else {
         log(response.body);
-        errorMessage.value = json['message'].toString();
+        buildCustomToast(
+            "Terjadi masalah. Error : ${response.body}", MessageType.failed);
       }
-    } on Exception catch (e) {
-      log(e.toString());
+    } finally {
+      isLoading(false);
     }
-    isLoading(false);
   }
 
   Future<List<TypeModel>> fetchProductTypes() async {

@@ -15,6 +15,7 @@ class TransactionModel {
     required this.id,
     required this.invoiceCode,
     required this.grandTotal,
+    required this.remainingPay,
     required this.storeId,
     required this.salesId,
     required this.paymentMethod,
@@ -38,6 +39,7 @@ class TransactionModel {
   int id;
   String invoiceCode;
   int grandTotal;
+  int remainingPay;
   int storeId;
   int salesId;
   String? paymentMethod;
@@ -62,6 +64,7 @@ class TransactionModel {
         id: json["id"],
         invoiceCode: json["invoice_code"],
         grandTotal: json["grand_total"],
+        remainingPay: json["remaining_pay"],
         storeId: json["store_id"],
         salesId: json["sales_id"],
         paymentMethod: json["payment_method"],
@@ -89,6 +92,7 @@ class TransactionModel {
         "id": id,
         "invoice_code": invoiceCode,
         "grand_total": grandTotal,
+        "remaining_pay": remainingPay,
         "store_id": storeId,
         "sales_id": salesId,
         "payment_method": paymentMethod,

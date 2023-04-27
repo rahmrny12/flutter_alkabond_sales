@@ -36,6 +36,7 @@ class _SalesPageState extends State<SalesPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
         final result = await showDialog(
           context: context,
           builder: (BuildContext context) {

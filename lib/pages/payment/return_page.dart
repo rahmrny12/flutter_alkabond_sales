@@ -59,6 +59,7 @@ class _ReturnPageState extends State<ReturnPage> {
                 SizedBox(height: CustomPadding.smallPadding),
                 TextFormField(
                   controller: desccriptionController,
+                  textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Keterangan wajib diisi.';

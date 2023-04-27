@@ -81,10 +81,7 @@ class _DashboardPageState extends State<DashboardPage> {
               centerTitle: true,
               title: isExpanded
                   ? Text("Sejahtera Bersama",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.0,
-                      ))
+                      style: Theme.of(context).textTheme.headline5)
                   : null,
             ),
           ),

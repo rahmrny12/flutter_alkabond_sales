@@ -5,6 +5,7 @@ import 'package:flutter_alkabond_sales/constant.dart';
 import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/pages/payment/payment_controller.dart';
+import 'package:flutter_alkabond_sales/pages/sales_history/sales_detail_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_binding.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_controller.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_page.dart';
@@ -16,10 +17,12 @@ class PayTempoPage extends StatefulWidget {
   const PayTempoPage(
       {super.key,
       required this.transactionId,
+      required this.remainingPay,
       required this.payments,
       required this.type});
 
   final int transactionId;
+  final int remainingPay;
   final List<Payment> payments;
   final HistoryType type;
 
@@ -39,7 +42,7 @@ class _PayTempoPageState extends State<PayTempoPage> {
     return Scaffold(
         body: CustomScrollView(
       slivers: [
-        SliverPersistentHeader(delegate: TotalCard(salesHistoryController)),
+        SliverPersistentHeader(delegate: TotalCard(widget.remainingPay)),
         SliverToBoxAdapter(
           child: Column(
             children: [
@@ -127,12 +130,18 @@ class _PayTempoPageState extends State<PayTempoPage> {
                                           totalPay: totalPayController.text,
                                           context: context,
                                           mounted: mounted);
-                                  if (result['status_code'] == 200) {
+                                  if (result != null &&
+                                      result['status_code'] == 200) {
                                     if (!mounted) return;
                                     Navigator.pop(context);
                                     Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SalesDetail(
+                                                type: widget.type,
+                                                transactionId:
+                                                    widget.transactionId)));
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -243,9 +252,9 @@ class _PayTempoPageState extends State<PayTempoPage> {
 }
 
 class TotalCard extends SliverPersistentHeaderDelegate {
-  TotalCard(this.salesHistoryController);
+  TotalCard(this.remainingPay);
 
-  final SalesHistoryController salesHistoryController;
+  final int remainingPay;
 
   @override
   double get maxExtent => 260 + 260 / 2;
@@ -298,8 +307,7 @@ class TotalCard extends SliverPersistentHeaderDelegate {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          parseToRupiah(
-                              salesHistoryController.grandTotal.value ?? 0),
+                          parseToRupiah(remainingPay),
                           style: Theme.of(context)
                               .textTheme
                               .headline2!
@@ -310,7 +318,7 @@ class TotalCard extends SliverPersistentHeaderDelegate {
                         ),
                         SizedBox(height: CustomPadding.smallPadding),
                         Text(
-                          "Total jumlah cicilan",
+                          "Total sisa jumlah cicilan",
                           style: Theme.of(context)
                               .textTheme
                               .headline5!

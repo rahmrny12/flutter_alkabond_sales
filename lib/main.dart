@@ -24,11 +24,11 @@ Future<void> main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var email = prefs.getString('email');
 
-  SalesController controller = Get.put(SalesController());
-  var checkToken = await controller.fetchStores();
-  if (checkToken.isEmpty) {
-    email == null;
-  }
+  // SalesController controller = Get.put(SalesController());
+  // var checkToken = await controller.fetchStores();
+  // if (checkToken.isEmpty) {
+  //   email == null;
+  // }
 
   runApp(MyApp(email: email));
 }
