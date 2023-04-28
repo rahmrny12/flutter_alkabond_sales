@@ -21,11 +21,22 @@ class SalesHistoryController extends GetxController {
   var from = Rxn<DateTime>();
   var to = Rxn<DateTime>();
 
+  var errorMessage = Rxn<String>();
+
+  TextEditingController dateFromController = TextEditingController();
+  TextEditingController dateToController = TextEditingController();
+
+  void initDate() {
+    from.value = now.subtract(const Duration(days: 29));
+    dateFromController.text = DateFormat("dd-MM-yyyy").format(from.value!);
+    to.value = now;
+    dateToController.text = DateFormat("dd-MM-yyyy").format(to.value!);
+  }
+
   @override
   void onInit() {
     super.onInit();
-    from.value = now.subtract(const Duration(days: 30));
-    to.value = now;
+    initDate();
   }
 
   Future<List<TransactionModel>> fetchTransactions(filter) async {
@@ -45,10 +56,12 @@ class SalesHistoryController extends GetxController {
       if (response.statusCode == 200 && json['status_code'] == 200) {
         transactions = transactionModelFromJson(json['data']);
       } else {
-        log(response.body);
+        log(json.toString());
+        throw Exception("Terjadi masalah. Coba lagi nanti.");
       }
     } on Exception catch (e) {
-      log(e.toString());
+      buildCustomToast(
+          "Terjadi kesalahan. ${e.toString()}", MessageType.success);
     } finally {
       isLoading(false);
     }

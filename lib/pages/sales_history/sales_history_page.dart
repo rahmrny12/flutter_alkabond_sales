@@ -25,10 +25,14 @@ class SalesHistoryPage extends StatefulWidget {
 }
 
 class _SalesHistoryPageState extends State<SalesHistoryPage> {
-  TextEditingController dateFromController = TextEditingController();
-  TextEditingController dateToController = TextEditingController();
   SalesHistoryController salesHistoryController =
       Get.put(SalesHistoryController());
+
+  @override
+  void dispose() {
+    // salesHistoryController.initDate();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +83,27 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
     );
   }
 
+  Center buildErrorMessage(BuildContext context) {
+    return Center(
+        child: Padding(
+      padding: EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            salesHistoryController.errorMessage.value ?? "",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headline5,
+          ),
+          // SizedBox(
+          //   height: CustomPadding.smallPadding,
+          // ),
+          // buildRefreshHistoryButton(context)
+        ],
+      ),
+    ));
+  }
+
   Widget buildFilterButton(BuildContext context, HistoryType filter) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: CustomPadding.smallPadding),
@@ -90,380 +115,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
               foregroundColor: Theme.of(context).colorScheme.onSecondary,
             ),
             onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(40))),
-                builder: (context) {
-                  return DraggableScrollableSheet(
-                    maxChildSize: 1,
-                    expand: false,
-                    initialChildSize: 0.7,
-                    minChildSize: 0.7,
-                    builder: (context, scrollController) {
-                      return GetBuilder<SalesHistoryController>(
-                          builder: (controller) {
-                        return SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  top: CustomPadding.mediumPadding,
-                                  bottom: CustomPadding.smallPadding,
-                                  left: CustomPadding.mediumPadding,
-                                  right: CustomPadding.mediumPadding,
-                                ),
-                                child: Text('Filter Transaksi',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline4!
-                                        .copyWith(color: Colors.black)),
-                              ),
-                              SizedBox(height: CustomPadding.mediumPadding),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: CustomPadding.mediumPadding),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.3,
-                                        margin: EdgeInsets.symmetric(
-                                            vertical: CustomPadding
-                                                .extraSmallPadding),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text("Tanggal awal",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .copyWith(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSecondary,
-                                                        fontWeight:
-                                                            FontWeight.w400)),
-                                            SizedBox(
-                                                height:
-                                                    CustomPadding.smallPadding /
-                                                        2),
-                                            GestureDetector(
-                                              onTap: () {
-                                                showDatePicker(
-                                                  context: context,
-                                                  builder: (context, child) {
-                                                    return Theme(
-                                                      data: Theme.of(context)
-                                                          .copyWith(
-                                                        colorScheme:
-                                                            ColorScheme.light(
-                                                          primary:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .primary,
-                                                          onPrimary: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onPrimary, // header text color
-                                                          onSurface: Colors
-                                                              .black, // body text color
-                                                        ),
-                                                      ),
-                                                      child: child!,
-                                                    );
-                                                  },
-                                                  initialDate: DateTime(
-                                                      DateTime.now().year,
-                                                      DateTime.now().month - 1,
-                                                      DateTime.now().day),
-                                                  firstDate: DateTime(2000),
-                                                  lastDate: DateTime.now(),
-                                                ).then((value) {
-                                                  controller.from.value = value;
-                                                  dateFromController
-                                                      .text = (value ==
-                                                          null)
-                                                      ? ''
-                                                      : DateFormat("dd-MM-yyyy")
-                                                          .format(value);
-                                                });
-                                              },
-                                              child: TextField(
-                                                controller: dateFromController,
-                                                textInputAction:
-                                                    TextInputAction.next,
-                                                enabled: false,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .copyWith(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSecondary,
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                decoration: InputDecoration(
-                                                  filled: true,
-                                                  fillColor: Theme.of(context)
-                                                      .colorScheme
-                                                      .surface
-                                                      .withOpacity(0.4),
-                                                  border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  contentPadding:
-                                                      EdgeInsets.only(
-                                                          left: CustomPadding
-                                                              .mediumPadding),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: CustomPadding.smallPadding),
-                                    Expanded(
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.3,
-                                        margin: EdgeInsets.symmetric(
-                                            vertical: CustomPadding
-                                                .extraSmallPadding),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text("Tanggal akhir",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .copyWith(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSecondary,
-                                                        fontWeight:
-                                                            FontWeight.w400)),
-                                            SizedBox(
-                                                height:
-                                                    CustomPadding.smallPadding /
-                                                        2),
-                                            GestureDetector(
-                                              onTap: () {
-                                                showDatePicker(
-                                                  context: context,
-                                                  builder: (context, child) {
-                                                    return Theme(
-                                                      data: Theme.of(context)
-                                                          .copyWith(
-                                                        colorScheme:
-                                                            ColorScheme.light(
-                                                          primary:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .primary,
-                                                          onPrimary: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onPrimary, // header text color
-                                                          onSurface: Colors
-                                                              .black, // body text color
-                                                        ),
-                                                      ),
-                                                      child: child!,
-                                                    );
-                                                  },
-                                                  initialDate: DateTime(
-                                                      DateTime.now().year,
-                                                      DateTime.now().month - 1,
-                                                      DateTime.now().day),
-                                                  firstDate: DateTime(2000),
-                                                  lastDate: DateTime.now(),
-                                                ).then((value) {
-                                                  controller.to.value = value;
-                                                  dateToController
-                                                      .text = (value ==
-                                                          null)
-                                                      ? ''
-                                                      : DateFormat("dd-MM-yyyy")
-                                                          .format(value);
-                                                });
-                                              },
-                                              child: TextField(
-                                                controller: dateToController,
-                                                enabled: false,
-                                                textInputAction:
-                                                    TextInputAction.next,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6!
-                                                    .copyWith(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSecondary,
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                decoration: InputDecoration(
-                                                  filled: true,
-                                                  fillColor: Theme.of(context)
-                                                      .colorScheme
-                                                      .surface
-                                                      .withOpacity(0.4),
-                                                  border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  contentPadding:
-                                                      EdgeInsets.only(
-                                                          left: CustomPadding
-                                                              .mediumPadding),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                margin: EdgeInsets.symmetric(
-                                    vertical: CustomPadding.extraSmallPadding,
-                                    horizontal: CustomPadding.mediumPadding),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Pilih toko",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                                fontWeight: FontWeight.w400)),
-                                    SizedBox(
-                                        height: CustomPadding.smallPadding / 2),
-                                    TextField(
-                                      textInputAction: TextInputAction.next,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary,
-                                              fontWeight: FontWeight.w400),
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Theme.of(context)
-                                            .colorScheme
-                                            .surface
-                                            .withOpacity(0.4),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        contentPadding: EdgeInsets.only(
-                                            left: CustomPadding.mediumPadding),
-                                        hintText: "Masukkan toko",
-                                        hintStyle: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary,
-                                                fontWeight: FontWeight.w400),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: CustomPadding.largePadding),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: CustomPadding.mediumPadding),
-                                padding: EdgeInsets.symmetric(
-                                    vertical: CustomPadding.smallPadding),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  border: Border(
-                                      top: BorderSide(
-                                          width: 1,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary)),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      style: ElevatedButton.styleFrom(
-                                        fixedSize: Size(150, 45),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(24),
-                                            side: BorderSide(
-                                                width: 2,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary)),
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
-                                        foregroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                      child: Text("Batal"),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        controller
-                                            .fetchTransactions(filter.name);
-                                        Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (BuildContext
-                                                        context) =>
-                                                    const SalesHistoryPage()));
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(24),
-                                          ),
-                                          fixedSize: Size(150, 45)),
-                                      child: Text("Filter"),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      });
-                    },
-                  );
-                },
-              );
+              buildFilterModal(context, filter);
             },
             child: Text(
               "Filter",
@@ -476,194 +128,526 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
     );
   }
 
-  Widget buildDoneHistory(
-      SalesHistoryController salesHistoryController, BuildContext context) {
-    return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(HistoryType.done.name),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.done) {
-          List<TransactionModel>? transactions = snap.data;
-          if (transactions!.isNotEmpty) {
-            return SingleChildScrollView(
+  Future<dynamic> buildFilterModal(BuildContext context, HistoryType filter) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          maxChildSize: 1,
+          expand: false,
+          initialChildSize: 0.7,
+          minChildSize: 0.7,
+          builder: (context, scrollController) {
+            return GetBuilder<SalesHistoryController>(builder: (controller) {
+              return SingleChildScrollView(
                 child: Column(
-              children: [
-                buildFilterButton(context, HistoryType.done),
-                ...List.generate(
-                    transactions.length,
-                    (index) => buildHistoryCard(context, HistoryType.done,
-                        transactions[index], salesHistoryController)),
-              ],
-            ));
-          } else {
-            return Center(
-                child: Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
-              child: Text(
-                "Data riwayat kosong.",
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ));
-          }
-        } else if (snap.hasError) {
-          return buildRefreshHistoryButton(context);
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: CustomPadding.largePadding,
+                        bottom: CustomPadding.smallPadding,
+                        left: CustomPadding.mediumPadding,
+                        right: CustomPadding.mediumPadding,
+                      ),
+                      child: Text('Filter Transaksi',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline4!
+                              .copyWith(color: Colors.black)),
+                    ),
+                    SizedBox(height: CustomPadding.mediumPadding),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: CustomPadding.mediumPadding),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              margin: EdgeInsets.symmetric(
+                                  vertical: CustomPadding.extraSmallPadding),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Tanggal awal",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                              fontWeight: FontWeight.w400)),
+                                  SizedBox(
+                                      height: CustomPadding.smallPadding / 2),
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDatePicker(
+                                        context: context,
+                                        builder: (context, child) {
+                                          return Theme(
+                                            data: Theme.of(context).copyWith(
+                                              colorScheme: ColorScheme.light(
+                                                primary: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                                onPrimary: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary, // header text color
+                                                onSurface: Colors
+                                                    .black, // body text color
+                                              ),
+                                            ),
+                                            child: child!,
+                                          );
+                                        },
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime.now(),
+                                      ).then((value) {
+                                        if (value != null) {
+                                          controller.from.value = value;
+                                          controller.dateFromController.text =
+                                              DateFormat("dd-MM-yyyy")
+                                                  .format(value);
+                                        }
+                                      });
+                                    },
+                                    child: TextField(
+                                      controller: controller.dateFromController,
+                                      textInputAction: TextInputAction.next,
+                                      enabled: false,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                              fontWeight: FontWeight.w700),
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withOpacity(0.4),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        contentPadding: EdgeInsets.only(
+                                            left: CustomPadding.mediumPadding),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: CustomPadding.smallPadding),
+                          Expanded(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              margin: EdgeInsets.symmetric(
+                                  vertical: CustomPadding.extraSmallPadding),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Tanggal akhir",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                              fontWeight: FontWeight.w400)),
+                                  SizedBox(
+                                      height: CustomPadding.smallPadding / 2),
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDatePicker(
+                                        context: context,
+                                        builder: (context, child) {
+                                          return Theme(
+                                            data: Theme.of(context).copyWith(
+                                              colorScheme: ColorScheme.light(
+                                                primary: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                                onPrimary: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary, // header text color
+                                                onSurface: Colors
+                                                    .black, // body text color
+                                              ),
+                                            ),
+                                            child: child!,
+                                          );
+                                        },
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime.now(),
+                                      ).then((value) {
+                                        if (value != null) {
+                                          controller.to.value = value;
+                                          controller.dateToController.text =
+                                              DateFormat("dd-MM-yyyy")
+                                                  .format(value);
+                                        }
+                                      });
+                                    },
+                                    child: TextField(
+                                      controller: controller.dateToController,
+                                      enabled: false,
+                                      textInputAction: TextInputAction.next,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                              fontWeight: FontWeight.w700),
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withOpacity(0.4),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        contentPadding: EdgeInsets.only(
+                                            left: CustomPadding.mediumPadding),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: EdgeInsets.symmetric(
+                          vertical: CustomPadding.extraSmallPadding,
+                          horizontal: CustomPadding.mediumPadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Pilih toko",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      fontWeight: FontWeight.w400)),
+                          SizedBox(height: CustomPadding.smallPadding / 2),
+                          TextField(
+                            textInputAction: TextInputAction.next,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                    fontWeight: FontWeight.w400),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0.4),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              contentPadding: EdgeInsets.only(
+                                  left: CustomPadding.mediumPadding),
+                              hintText: "Masukkan toko",
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: CustomPadding.largePadding),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: EdgeInsets.symmetric(
+                          horizontal: CustomPadding.mediumPadding),
+                      padding: EdgeInsets.symmetric(
+                          vertical: CustomPadding.smallPadding),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        border: Border(
+                            top: BorderSide(
+                                width: 1,
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(150, 45),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                  side: BorderSide(
+                                      width: 2,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary)),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                            ),
+                            child: Text("Batal"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              controller.fetchTransactions(filter.name);
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          const SalesHistoryPage()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                fixedSize: Size(150, 45)),
+                            child: Text("Filter"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            });
+          },
+        );
       },
     );
+  }
+
+  Widget buildDoneHistory(
+      SalesHistoryController salesHistoryController, BuildContext context) {
+    return SingleChildScrollView(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      buildFilterButton(context, HistoryType.done),
+      FutureBuilder<List<TransactionModel>>(
+        future: salesHistoryController.fetchTransactions(HistoryType.done.name),
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.done) {
+            List<TransactionModel>? transactions = snap.data;
+            if (transactions!.isNotEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...List.generate(
+                      transactions.length,
+                      (index) => buildHistoryCard(context, HistoryType.done,
+                          transactions[index], salesHistoryController)),
+                ],
+              );
+            } else {
+              return Padding(
+                  padding:
+                      EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                  child: buildRefreshHistoryButton(context));
+            }
+          } else if (snap.connectionState == ConnectionState.waiting) {
+            return Padding(
+                padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                child: Center(child: CircularProgressIndicator()));
+          } else {
+            return SizedBox();
+          }
+        },
+      )
+    ]));
   }
 
   Widget buildTempoHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
-    return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(HistoryType.tempo.name),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.done) {
-          List<TransactionModel>? transactions = snap.data;
-          if (transactions!.isNotEmpty) {
-            return SingleChildScrollView(
-                child: Column(
-              children: [
-                buildFilterButton(context, HistoryType.tempo),
-                ...List.generate(
-                    transactions.length,
-                    (index) => buildHistoryCard(context, HistoryType.tempo,
-                        transactions[index], salesHistoryController)),
-              ],
-            ));
+    return SingleChildScrollView(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      buildFilterButton(context, HistoryType.tempo),
+      FutureBuilder<List<TransactionModel>>(
+        future:
+            salesHistoryController.fetchTransactions(HistoryType.tempo.name),
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.done) {
+            List<TransactionModel>? transactions = snap.data;
+            if (transactions!.isNotEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...List.generate(
+                      transactions.length,
+                      (index) => buildHistoryCard(context, HistoryType.tempo,
+                          transactions[index], salesHistoryController)),
+                ],
+              );
+            } else {
+              return Padding(
+                  padding:
+                      EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                  child: buildRefreshHistoryButton(context));
+            }
+          } else if (snap.connectionState == ConnectionState.waiting) {
+            return Padding(
+                padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                child: Center(child: CircularProgressIndicator()));
           } else {
-            return Center(
-                child: Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
-              child: Text(
-                "Data riwayat kosong.",
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ));
+            return SizedBox();
           }
-        } else if (snap.hasError) {
-          return buildRefreshHistoryButton(context);
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+        },
+      )
+    ]));
   }
 
   Widget buildSentHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
-    return FutureBuilder<List<TransactionModel>>(
-      future: salesHistoryController.fetchTransactions(HistoryType.sent.name),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.done) {
-          List<TransactionModel>? transactions = snap.data;
-          if (transactions!.isNotEmpty) {
-            return SingleChildScrollView(
-                child: Column(
-              children: [
-                buildFilterButton(context, HistoryType.sent),
-                ...List.generate(
-                    transactions.length,
-                    (index) => buildHistoryCard(context, HistoryType.sent,
-                        transactions[index], salesHistoryController)),
-              ],
-            ));
+    return SingleChildScrollView(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      buildFilterButton(context, HistoryType.sent),
+      FutureBuilder<List<TransactionModel>>(
+        future: salesHistoryController.fetchTransactions(HistoryType.sent.name),
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.done) {
+            List<TransactionModel>? transactions = snap.data;
+            if (transactions!.isNotEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...List.generate(
+                      transactions.length,
+                      (index) => buildHistoryCard(context, HistoryType.sent,
+                          transactions[index], salesHistoryController)),
+                ],
+              );
+            } else {
+              return Padding(
+                  padding:
+                      EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                  child: buildRefreshHistoryButton(context));
+            }
+          } else if (snap.connectionState == ConnectionState.waiting) {
+            return Padding(
+                padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                child: Center(child: CircularProgressIndicator()));
           } else {
-            return Center(
-                child: Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
-              child: Text(
-                "Data riwayat kosong.",
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ));
+            return SizedBox();
           }
-        } else if (snap.hasError) {
-          return buildRefreshHistoryButton(context);
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+        },
+      )
+    ]));
   }
 
   Widget buildProcessHistory(
       SalesHistoryController salesHistoryController, BuildContext context) {
-    return FutureBuilder<List<TransactionModel>>(
-      future:
-          salesHistoryController.fetchTransactions(HistoryType.process.name),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.done) {
-          List<TransactionModel>? transactions = snap.data;
-          if (transactions!.isNotEmpty) {
-            return SingleChildScrollView(
-                child: Column(
-              children: [
-                buildFilterButton(context, HistoryType.process),
-                ...List.generate(
-                    transactions.length,
-                    (index) => buildHistoryCard(context, HistoryType.process,
-                        transactions[index], salesHistoryController)),
-              ],
-            ));
+    return SingleChildScrollView(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      buildFilterButton(context, HistoryType.process),
+      FutureBuilder<List<TransactionModel>>(
+        future:
+            salesHistoryController.fetchTransactions(HistoryType.process.name),
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.done) {
+            List<TransactionModel>? transactions = snap.data;
+            if (transactions!.isNotEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...List.generate(
+                      transactions.length,
+                      (index) => buildHistoryCard(context, HistoryType.process,
+                          transactions[index], salesHistoryController)),
+                ],
+              );
+            } else {
+              return Padding(
+                  padding:
+                      EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                  child: buildRefreshHistoryButton(context));
+            }
+          } else if (snap.connectionState == ConnectionState.waiting) {
+            return Padding(
+                padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
+                child: Center(child: CircularProgressIndicator()));
           } else {
-            return Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: CustomPadding.largePadding),
-                  child: Text(
-                    "Data riwayat kosong.",
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                ),
-                SizedBox(
-                  height: CustomPadding.mediumPadding,
-                ),
-                buildRefreshHistoryButton(context)
-              ],
-            ));
+            return SizedBox();
           }
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+        },
+      )
+    ]));
   }
 
   Padding buildRefreshHistoryButton(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
-      child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => SalesHistoryPage()));
-          },
-          style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              padding:
-                  EdgeInsets.symmetric(vertical: CustomPadding.smallPadding)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Refresh ulang",
-                style: Theme.of(context)
-                    .textTheme
-                    .headline5!
-                    .copyWith(color: Theme.of(context).colorScheme.onSecondary),
-              ),
-              SizedBox(width: CustomPadding.extraSmallPadding),
-              Icon(Icons.refresh, color: Theme.of(context).colorScheme.primary),
-            ],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+              child: Padding(
+            padding:
+                EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
+            child: Text(
+              "Data riwayat kosong.",
+              style: Theme.of(context).textTheme.headline4,
+            ),
           )),
+          SizedBox(height: CustomPadding.mediumPadding),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => SalesHistoryPage()));
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  padding: EdgeInsets.symmetric(
+                      vertical: CustomPadding.smallPadding)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Refresh ulang",
+                    style: Theme.of(context).textTheme.headline5!.copyWith(
+                        color: Theme.of(context).colorScheme.onSecondary),
+                  ),
+                  SizedBox(width: CustomPadding.extraSmallPadding),
+                  Icon(Icons.refresh,
+                      color: Theme.of(context).colorScheme.primary),
+                ],
+              )),
+        ],
+      ),
     );
   }
 
