@@ -78,13 +78,16 @@ class _SalesDetailState extends State<SalesDetail> {
                                                 .onPrimary)),
                               ),
                               SizedBox(width: CustomPadding.mediumPadding),
-                              Image.asset((widget.type == HistoryType.process)
-                                  ? "$imagePath/onprocess.png"
-                                  : (widget.type == HistoryType.sent)
-                                      ? "$imagePath/onsent.png"
-                                      : (widget.type == HistoryType.tempo)
-                                          ? "$imagePath/ontempo.png"
-                                          : "$imagePath/done.png")
+                              Image.asset(
+                                (widget.type == HistoryType.process)
+                                    ? "$imagePath/onprocess.png"
+                                    : (widget.type == HistoryType.sent)
+                                        ? "$imagePath/onsent.png"
+                                        : (widget.type == HistoryType.tempo)
+                                            ? "$imagePath/ontempo.png"
+                                            : "$imagePath/done.png",
+                                height: 70,
+                              )
                             ],
                           ),
                         ),
@@ -101,7 +104,10 @@ class _SalesDetailState extends State<SalesDetail> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.asset("$imagePath/icon/location.png"),
+                              Image.asset(
+                                "$imagePath/icon/location.png",
+                                height: 18,
+                              ),
                               SizedBox(width: CustomPadding.smallPadding),
                               Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -148,7 +154,10 @@ class _SalesDetailState extends State<SalesDetail> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.asset("$imagePath/icon/user.png"),
+                              Image.asset(
+                                "$imagePath/icon/user.png",
+                                height: 18,
+                              ),
                               SizedBox(width: CustomPadding.smallPadding),
                               Text("Sales : ${transaction.salesName}",
                                   style: Theme.of(context)
@@ -174,7 +183,10 @@ class _SalesDetailState extends State<SalesDetail> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.asset("$imagePath/icon/edit.png"),
+                              Image.asset(
+                                "$imagePath/icon/edit.png",
+                                height: 18,
+                              ),
                               SizedBox(width: CustomPadding.smallPadding),
                               Column(
                                 mainAxisSize: MainAxisSize.max,
@@ -247,7 +259,9 @@ class _SalesDetailState extends State<SalesDetail> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Image.asset(
-                                        "$imagePath/icon/credit-card.png"),
+                                      "$imagePath/icon/credit-card.png",
+                                      height: 18,
+                                    ),
                                     SizedBox(width: CustomPadding.smallPadding),
                                     Text(
                                         "Metode pembayaran : ${transaction.paymentMethod ?? '-'}",
@@ -275,7 +289,10 @@ class _SalesDetailState extends State<SalesDetail> {
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset("$imagePath/icon/dollar.png"),
+                                    Image.asset(
+                                      "$imagePath/icon/dollar.png",
+                                      height: 18,
+                                    ),
                                     SizedBox(width: CustomPadding.smallPadding),
                                     Text(
                                         "Status pembayaran : ${transaction.status}",
@@ -303,7 +320,10 @@ class _SalesDetailState extends State<SalesDetail> {
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset("$imagePath/icon/truck.png"),
+                                    Image.asset(
+                                      "$imagePath/icon/truck.png",
+                                      height: 18,
+                                    ),
                                     SizedBox(width: CustomPadding.smallPadding),
                                     Text(
                                         "Status Pengiriman : ${transaction.deliveryStatus}",
@@ -336,7 +356,10 @@ class _SalesDetailState extends State<SalesDetail> {
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Image.asset("$imagePath/icon/file-text.png"),
+                                  Image.asset(
+                                    "$imagePath/icon/file-text.png",
+                                    height: 18,
+                                  ),
                                   SizedBox(width: CustomPadding.smallPadding),
                                   Text("Rincian Pembayaran",
                                       style: Theme.of(context)
@@ -440,7 +463,9 @@ class _SalesDetailState extends State<SalesDetail> {
                                     SizedBox(
                                         width: CustomPadding.extraSmallPadding),
                                     Image.asset(
-                                        "$imagePath/icon/file-text.png"),
+                                      "$imagePath/icon/file-text.png",
+                                      height: 18,
+                                    ),
                                   ],
                                 )),
                           ),

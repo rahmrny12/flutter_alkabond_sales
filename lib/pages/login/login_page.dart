@@ -27,36 +27,39 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  GlobalKey<FormState> loginFormKey = GlobalKey();
+
   loginUser(BuildContext context) async {
-    try {
-      controller.updateIsLoading(true);
-      http.Response response =
-          await http.post(Uri.parse('$baseUrl/api/login'), body: {
-        'email': usernameController.text,
-        'password': passwordController.text,
-      });
-      var json = jsonDecode(response.body);
-      // ignore: unrelated_type_equality_checks
-      if (response.statusCode == 200 && json['status_code'] == 200) {
-        UserModel user = userModelFromJson(response.body);
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('login_token', user.accessToken);
-        prefs.setInt('id', user.data.id);
-        prefs.setString('username', user.data.username);
-        prefs.setString('email', user.data.email);
-        prefs.setString('name', user.data.salesName);
-        Get.toNamed('/home');
-      } else {
-        if (!mounted) return;
-        buildAlertSnackBar(
-            context, "Login gagal. Cek kembali username dan password Anda");
-        log(response.body);
+    if (loginFormKey.currentState!.validate()) {
+      try {
+        controller.updateIsLoading(true);
+        http.Response response =
+            await http.post(Uri.parse('$baseUrl/api/login'), body: {
+          'email': usernameController.text,
+          'password': passwordController.text,
+        });
+        var json = jsonDecode(response.body);
+        if (response.statusCode == 200 && json['status_code'] == 200) {
+          UserModel user = userModelFromJson(response.body);
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('login_token', user.accessToken);
+          prefs.setInt('id', user.data.id);
+          prefs.setString('username', user.data.username);
+          prefs.setString('email', user.data.email);
+          prefs.setString('name', user.data.salesName);
+          prefs.setString('phone_number', user.data.phoneNumber);
+          prefs.setString('city', user.data.city);
+          Get.toNamed('/home');
+        } else {
+          throw Exception(
+              "Login gagal. Cek kembali username dan password Anda");
+        }
+      } catch (e) {
+        buildAlertSnackBar(context, "Terjadi masalah. Error : $e");
+        log("Login gagal. Error : ${e.toString()}");
+      } finally {
+        controller.updateIsLoading(false);
       }
-    } catch (e) {
-      buildAlertSnackBar(context, "Terjadi masalah. Error : $e");
-      log("Login gagal. Error : $e");
-    } finally {
-      controller.updateIsLoading(false);
     }
   }
 
@@ -94,83 +97,88 @@ class _LoginPageState extends State<LoginPage> {
                       Spacer(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Sign In",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline2),
-                                  Container(
-                                    width: 130,
-                                    height: 5,
-                                    margin:
-                                        EdgeInsets.only(top: 12, bottom: 24),
-                                    decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            buildLoginInput(
-                                context: context,
-                                hint: "Masukkan username...",
-                                controller: usernameController,
-                                icon: "$imagePath/icon/username.png",
-                                isPassword: false),
-                            buildLoginInput(
-                                context: context,
-                                hint: "Masukkan password...",
-                                controller: passwordController,
-                                icon: "$imagePath/icon/password.png",
-                                isPassword: true),
-                            GetBuilder<LoginController>(builder: (controller) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 36),
+                        child: Form(
+                          key: loginFormKey,
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (controller.isDataLoading.value)
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            bottom:
-                                                CustomPadding.mediumPadding),
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    ElevatedButton(
-                                      onPressed: controller.isDataLoading.value
-                                          ? null
-                                          : () {
-                                              loginUser(context);
-                                            },
-                                      style: ButtonStyle(
-                                          shape: MaterialStatePropertyAll(
-                                              RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          24))),
-                                          padding: MaterialStatePropertyAll(
-                                              EdgeInsets.symmetric(
-                                                  vertical: 12,
-                                                  horizontal: 48))),
-                                      child: Text(
-                                        'LOGIN',
+                                    Text("Sign In",
                                         style: Theme.of(context)
                                             .textTheme
-                                            .headline5,
-                                      ),
+                                            .headline2),
+                                    Container(
+                                      width: 130,
+                                      height: 5,
+                                      margin:
+                                          EdgeInsets.only(top: 12, bottom: 24),
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary),
                                     ),
                                   ],
                                 ),
-                              );
-                            })
-                          ],
+                              ),
+                              buildLoginInput(
+                                  context: context,
+                                  hint: "username",
+                                  controller: usernameController,
+                                  icon: "$imagePath/icon/username.png",
+                                  isPassword: false),
+                              buildLoginInput(
+                                  context: context,
+                                  hint: "password",
+                                  controller: passwordController,
+                                  icon: "$imagePath/icon/password.png",
+                                  isPassword: true),
+                              GetBuilder<LoginController>(
+                                  builder: (controller) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 36),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (controller.isDataLoading.value)
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom:
+                                                  CustomPadding.mediumPadding),
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ElevatedButton(
+                                        onPressed:
+                                            controller.isDataLoading.value
+                                                ? null
+                                                : () {
+                                                    loginUser(context);
+                                                  },
+                                        style: ButtonStyle(
+                                            shape: MaterialStatePropertyAll(
+                                                RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            24))),
+                                            padding: MaterialStatePropertyAll(
+                                                EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 48))),
+                                        child: Text(
+                                          'LOGIN',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              })
+                            ],
+                          ),
                         ),
                       ),
                       Spacer(flex: 2),
@@ -193,7 +201,13 @@ class _LoginPageState extends State<LoginPage> {
       required bool isPassword}) {
     return Padding(
       padding: EdgeInsets.all(8.0),
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return '$hint wajib diisi.';
+          }
+          return null;
+        },
         textInputAction:
             (isPassword) ? TextInputAction.done : TextInputAction.next,
         controller: controller,
@@ -203,19 +217,30 @@ class _LoginPageState extends State<LoginPage> {
         ),
         decoration: InputDecoration(
             filled: true,
-            fillColor: Theme.of(context).colorScheme.onBackground,
-            prefixIcon: Image.asset(
-              icon,
-              height: 16,
+            fillColor:
+                Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+            prefixIcon: Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: CustomPadding.mediumPadding),
+              child: Image.asset(icon),
+            ),
+            prefixIconConstraints: BoxConstraints(maxHeight: 24),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(style: BorderStyle.none),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  style: BorderStyle.solid,
+                  color: Theme.of(context).colorScheme.onPrimary),
+              borderRadius: BorderRadius.circular(30),
             ),
             border: OutlineInputBorder(
               borderSide: BorderSide(style: BorderStyle.none),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(30),
             ),
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
-            )),
+            hintText: "Masukkan $hint...",
+            hintStyle: Theme.of(context).textTheme.headline5),
       ),
     );
   }

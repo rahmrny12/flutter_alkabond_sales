@@ -39,7 +39,10 @@ class _CheckoutState extends State<Checkout> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset("$imagePath/icon/location.png"),
+                  Image.asset(
+                    "$imagePath/icon/location.png",
+                    height: 18,
+                  ),
                   SizedBox(width: CustomPadding.smallPadding),
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -83,7 +86,10 @@ class _CheckoutState extends State<Checkout> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset("$imagePath/icon/user.png"),
+                  Image.asset(
+                    "$imagePath/icon/user.png",
+                    height: 18,
+                  ),
                   SizedBox(width: CustomPadding.smallPadding),
                   FutureBuilder<String?>(
                       future: salesController.getLoggedInSalesName(),
@@ -113,7 +119,10 @@ class _CheckoutState extends State<Checkout> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset("$imagePath/icon/edit.png"),
+                  Image.asset(
+                    "$imagePath/icon/edit.png",
+                    height: 18,
+                  ),
                   SizedBox(width: CustomPadding.smallPadding),
                   Column(
                     mainAxisSize: MainAxisSize.max,
@@ -166,7 +175,10 @@ class _CheckoutState extends State<Checkout> {
                     mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset("$imagePath/icon/file-text.png"),
+                      Image.asset(
+                        "$imagePath/icon/file-text.png",
+                        height: 18,
+                      ),
                       SizedBox(width: CustomPadding.smallPadding),
                       Text("Rincian Pembayaran",
                           style: Theme.of(context)

@@ -1,8 +1,10 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
 import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
+import 'package:flutter_alkabond_sales/model/store_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_detail_page.dart';
@@ -27,10 +29,11 @@ class SalesHistoryPage extends StatefulWidget {
 class _SalesHistoryPageState extends State<SalesHistoryPage> {
   SalesHistoryController salesHistoryController =
       Get.put(SalesHistoryController());
+  SalesController salesController = Get.put(SalesController());
 
   @override
   void dispose() {
-    // salesHistoryController.initDate();
+    salesHistoryController.initDate();
     super.dispose();
   }
 
@@ -238,6 +241,11 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                                         border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10)),
+                                        suffixIcon: Icon(
+                                            Icons.calendar_today_outlined,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary),
                                         contentPadding: EdgeInsets.only(
                                             left: CustomPadding.mediumPadding),
                                       ),
@@ -321,6 +329,11 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                                         border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10)),
+                                        suffixIcon: Icon(
+                                            Icons.calendar_today_outlined,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary),
                                         contentPadding: EdgeInsets.only(
                                             left: CustomPadding.mediumPadding),
                                       ),
@@ -335,9 +348,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(
-                          vertical: CustomPadding.extraSmallPadding,
-                          horizontal: CustomPadding.mediumPadding),
+                      margin: EdgeInsets.all(CustomPadding.mediumPadding),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -351,35 +362,95 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                                           .onSecondary,
                                       fontWeight: FontWeight.w400)),
                           SizedBox(height: CustomPadding.smallPadding / 2),
-                          TextField(
-                            textInputAction: TextInputAction.next,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6!
-                                .copyWith(
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: DropdownSearch<StoreModel>(
+                              popupProps: PopupProps.dialog(
+                                  constraints: BoxConstraints(
+                                    maxHeight:
+                                        MediaQuery.of(context).size.height *
+                                            0.5,
+                                  ),
+                                  dialogProps: DialogProps(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .surface),
+                                  textStyle: Theme.of(context)
+                                      .textTheme
+                                      .headline4!
+                                      .copyWith(color: Colors.white),
+                                  showSelectedItems: true,
+                                  showSearchBox: true,
+                                  searchFieldProps: TextFieldProps(
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(color: Colors.white),
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        hintText: "Cari toko",
+                                        fillColor: Theme.of(context)
+                                            .colorScheme
+                                            .onBackground
+                                            .withOpacity(0.5),
+                                      ))),
+                              compareFn: (item1, item2) => item1.isEqual(item2),
+                              // filterFn: (item, filter) =>
+                              //     item.storeFilterByName(filter),
+                              asyncItems: (text) =>
+                                  salesController.fetchStores(),
+                              itemAsString: (store) =>
+                                  "${store.storeName} - ${store.address}",
+                              dropdownDecoratorProps: DropDownDecoratorProps(
+                                baseStyle: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary),
+                                dropdownSearchDecoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Theme.of(context)
+                                      .colorScheme
+                                      .surface
+                                      .withOpacity(0.4),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  contentPadding: EdgeInsets.only(
+                                      left: CustomPadding.mediumPadding),
+                                ),
+                              ),
+                              dropdownButtonProps: DropdownButtonProps(
+                                icon: Icon(Icons.search,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .onSecondary,
-                                    fontWeight: FontWeight.w400),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0.4),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              contentPadding: EdgeInsets.only(
-                                  left: CustomPadding.mediumPadding),
-                              hintText: "Masukkan toko",
-                              hintStyle: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                      fontWeight: FontWeight.w400),
+                                        .onSecondary),
+                              ),
+                              dropdownBuilder:
+                                  (BuildContext context, StoreModel? store) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      top: CustomPadding.extraSmallPadding / 2),
+                                  child: Text(
+                                      store == null
+                                          ? "-"
+                                          : "${store.storeName} - ${store.address}",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline5!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary)),
+                                );
+                              },
+                              onChanged: (value) {
+                                salesController.selectedStore.value = value;
+                                salesHistoryController.storeId.value =
+                                    value?.id;
+                              },
+                              selectedItem: salesController.selectedStore.value,
                             ),
                           ),
                         ],

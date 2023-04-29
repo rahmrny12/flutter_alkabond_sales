@@ -31,6 +31,7 @@ class SalesHistoryController extends GetxController {
     dateFromController.text = DateFormat("dd-MM-yyyy").format(from.value!);
     to.value = now;
     dateToController.text = DateFormat("dd-MM-yyyy").format(to.value!);
+    storeId.value = null;
   }
 
   @override

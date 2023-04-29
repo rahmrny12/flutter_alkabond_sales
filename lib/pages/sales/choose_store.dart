@@ -41,8 +41,9 @@ class _ChooseStoreState extends State<ChooseStore> {
                   EdgeInsets.symmetric(horizontal: CustomPadding.largePadding),
               child: salesController.isLoading.isTrue
                   ? Padding(
-                      padding:
-                          EdgeInsets.only(top: CustomPadding.mediumPadding),
+                      padding: EdgeInsets.only(
+                          top: CustomPadding.mediumPadding,
+                          bottom: CustomPadding.extraLargePadding),
                       child: const CircularProgressIndicator(),
                     )
                   : Column(
