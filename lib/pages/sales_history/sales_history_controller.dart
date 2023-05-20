@@ -47,7 +47,7 @@ class SalesHistoryController extends GetxController {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       http.Response response = await http.get(
           Uri.parse(
-              "$baseUrl/api/transaction/all?filter=$filter&storeId=${storeId.value ?? ''}&from=${(from.value != null) ? DateFormat('yyyy-MM-dd').format(from.value!) : ''}&to=${(to.value != null) ? DateFormat('yyyy-MM-dd').format(to.value!) : ''}"),
+              "$baseUrl/api/transaction/al?filter=$filter&storeId=${storeId.value ?? ''}&from=${(from.value != null) ? DateFormat('yyyy-MM-dd').format(from.value!) : ''}&to=${(to.value != null) ? DateFormat('yyyy-MM-dd').format(to.value!) : ''}"),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -63,6 +63,7 @@ class SalesHistoryController extends GetxController {
     } on Exception catch (e) {
       buildCustomToast(
           "Terjadi kesalahan. ${e.toString()}", MessageType.success);
+      throw Exception("Terjadi masalah. Coba lagi nanti.");
     } finally {
       isLoading(false);
     }

@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_alkabond_sales/pages/dashboard/dashboard_page.dart';
 import 'package:flutter_alkabond_sales/pages/home/home_controller.dart';
+import 'package:flutter_alkabond_sales/pages/login/login_page.dart';
 import 'package:flutter_alkabond_sales/pages/profile/profile_page.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_page.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends GetView<HomeController> {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     Get.lazyPut<HomeController>(() => HomeController());
-
     return GetBuilder<HomeController>(builder: (controller) {
       return Scaffold(
         bottomNavigationBar: buildNavBar(context, controller),

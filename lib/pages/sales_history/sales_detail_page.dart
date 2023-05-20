@@ -45,6 +45,31 @@ class _SalesDetailState extends State<SalesDetail> {
             builder: (context, snap) {
               if (snap.connectionState == ConnectionState.done) {
                 TransactionModel? transaction = snap.data;
+
+                late String paymentStatus;
+                switch (transaction?.status) {
+                  case "paid":
+                    paymentStatus = "Sudah Lunas";
+                    break;
+                  case "partial":
+                    paymentStatus = "Dalam Cicilan";
+                    break;
+                  default:
+                    paymentStatus = "Belum Dibayar";
+                }
+
+                late String deliveryStatus;
+                switch (transaction?.deliveryStatus) {
+                  case "sent":
+                    deliveryStatus = "Sudah Dikirim";
+                    break;
+                  case "proccess":
+                    deliveryStatus = "Sedang Diproses";
+                    break;
+                  default:
+                    deliveryStatus = "Belum Dikirim";
+                }
+
                 if (transaction != null) {
                   return SingleChildScrollView(
                     child: Column(
@@ -294,15 +319,21 @@ class _SalesDetailState extends State<SalesDetail> {
                                       height: 18,
                                     ),
                                     SizedBox(width: CustomPadding.smallPadding),
-                                    Text(
-                                        "Status pembayaran : ${transaction.status}",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary)),
+                                    RichText(
+                                      text: TextSpan(
+                                          text: "Status pembayaran : ",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .copyWith(
+                                                  fontSize: 12,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary),
+                                          children: [
+                                            TextSpan(text: paymentStatus)
+                                          ]),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -325,15 +356,21 @@ class _SalesDetailState extends State<SalesDetail> {
                                       height: 18,
                                     ),
                                     SizedBox(width: CustomPadding.smallPadding),
-                                    Text(
-                                        "Status Pengiriman : ${transaction.deliveryStatus}",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary)),
+                                    RichText(
+                                      text: TextSpan(
+                                          text: "Status pengiriman : ",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .copyWith(
+                                                  fontSize: 12,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary),
+                                          children: [
+                                            TextSpan(text: deliveryStatus)
+                                          ]),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -642,6 +679,7 @@ class _SalesDetailState extends State<SalesDetail> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ReturnPage(
+                                    transactionDetailType: widget.type,
                                     transactionDetailId: detail.id,
                                   ),
                                 ));

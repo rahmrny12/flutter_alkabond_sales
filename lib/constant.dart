@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-const String baseUrl = 'https://32cf-36-73-181-138.ngrok-free.app';
+const String baseUrl = 'https://14ca-158-140-172-120.ngrok-free.app';
 // const String baseUrl = 'http://penjualanbersama.000webhostapp.com';
 // const String baseUrl = 'http://10.0.2.2:8000';
 // pak rete

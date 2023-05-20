@@ -61,15 +61,15 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                 labelColor: Theme.of(context).colorScheme.primary,
                 unselectedLabelColor: Theme.of(context).colorScheme.onPrimary,
                 tabs: const [
-                  Tab(
-                    text: "Proses",
-                  ),
-                  Tab(
-                    text: "Dikirim",
-                  ),
-                  Tab(
-                    text: "Cicilan",
-                  ),
+                  // Tab(
+                  //   text: "Proses",
+                  // ),
+                  // Tab(
+                  //   text: "Dikirim",
+                  // ),
+                  // Tab(
+                  //   text: "Cicilan",
+                  // ),
                   Tab(
                     text: "Selesai",
                   ),
@@ -77,9 +77,9 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
           ),
           body: TabBarView(
             children: [
-              buildProcessHistory(salesHistoryController, context),
-              buildSentHistory(salesHistoryController, context),
-              buildTempoHistory(salesHistoryController, context),
+              // buildProcessHistory(salesHistoryController, context),
+              // buildSentHistory(salesHistoryController, context),
+              // buildTempoHistory(salesHistoryController, context),
               buildDoneHistory(salesHistoryController, context),
             ],
           )),
@@ -531,7 +531,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
       FutureBuilder<List<TransactionModel>>(
         future: salesHistoryController.fetchTransactions(HistoryType.done.name),
         builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.done) {
+          if (snap.hasData) {
             List<TransactionModel>? transactions = snap.data;
             if (transactions!.isNotEmpty) {
               return Column(
@@ -549,12 +549,12 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                       EdgeInsets.only(top: CustomPadding.extraLargePadding),
                   child: buildRefreshHistoryButton(context));
             }
-          } else if (snap.connectionState == ConnectionState.waiting) {
+          } else if (snap.hasError) {
+            return SizedBox();
+          } else {
             return Padding(
                 padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
                 child: Center(child: CircularProgressIndicator()));
-          } else {
-            return SizedBox();
           }
         },
       )
@@ -592,6 +592,8 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
             return Padding(
                 padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
                 child: Center(child: CircularProgressIndicator()));
+          } else if (snap.hasError) {
+            return SizedBox();
           } else {
             return SizedBox();
           }
@@ -630,6 +632,8 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
             return Padding(
                 padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
                 child: Center(child: CircularProgressIndicator()));
+          } else if (snap.hasError) {
+            return SizedBox();
           } else {
             return SizedBox();
           }
@@ -669,6 +673,8 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
             return Padding(
                 padding: EdgeInsets.only(top: CustomPadding.extraLargePadding),
                 child: Center(child: CircularProgressIndicator()));
+          } else if (snap.hasError) {
+            return SizedBox();
           } else {
             return SizedBox();
           }

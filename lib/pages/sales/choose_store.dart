@@ -53,10 +53,10 @@ class _ChooseStoreState extends State<ChooseStore> {
                           width: MediaQuery.of(context).size.width,
                           child: DropdownSearch<StoreModel>(
                             popupProps: PopupProps.dialog(
-                                constraints: BoxConstraints(
-                                  maxHeight:
-                                      MediaQuery.of(context).size.height * 0.5,
-                                ),
+                                // constraints: BoxConstraints(
+                                //   maxHeight:
+                                //       MediaQuery.of(context).size.height * 0.5,
+                                // ),
                                 dialogProps: DialogProps(
                                     backgroundColor:
                                         Theme.of(context).colorScheme.surface),
@@ -137,155 +137,147 @@ class _ChooseStoreState extends State<ChooseStore> {
                                     borderRadius: BorderRadius.vertical(
                                         top: Radius.circular(20))),
                                 builder: (context) {
-                                  return DraggableScrollableSheet(
-                                    maxChildSize: 1,
-                                    initialChildSize: 0.9,
-                                    minChildSize: 0.8,
-                                    snap: true,
-                                    snapSizes: const [.8, .9, 1],
-                                    expand: false,
-                                    builder: (context, scrollController) {
-                                      return SingleChildScrollView(
-                                        controller: scrollController,
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal:
-                                                  CustomPadding.largePadding),
-                                          child: Form(
-                                            key: _formAddStoreKey,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: CustomPadding
-                                                          .mediumPadding,
-                                                      bottom: CustomPadding
-                                                          .smallPadding),
-                                                  child: Text('Tambah Toko',
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom),
+                                    child: SingleChildScrollView(
+                                      // controller: scrollController,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                CustomPadding.largePadding),
+                                        child: Form(
+                                          key: _formAddStoreKey,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: CustomPadding
+                                                        .mediumPadding,
+                                                    bottom: CustomPadding
+                                                        .smallPadding),
+                                                child: Text('Tambah Toko',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline4!
+                                                        .copyWith(
+                                                            color:
+                                                                Colors.black)),
+                                              ),
+                                              buildAddStoreInput(
+                                                context: context,
+                                                label: "Nama Toko",
+                                                hint: "Masukkan nama toko...",
+                                                controller:
+                                                    _storeNameController,
+                                              ),
+                                              buildAddStoreInput(
+                                                context: context,
+                                                label: "Alamat",
+                                                hint: "Masukkan alamat...",
+                                                controller:
+                                                    _storeAddressController,
+                                              ),
+                                              buildAddStoreInput(
+                                                context: context,
+                                                label: "Nomer HP",
+                                                hint: "Masukkan nomer hp...",
+                                                controller:
+                                                    _storePhoneNumberController,
+                                              ),
+                                              SizedBox(
+                                                  height: CustomPadding
+                                                      .mediumPadding),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.9,
+                                                child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      if (_formAddStoreKey
+                                                          .currentState!
+                                                          .validate()) {
+                                                        Navigator.pop(context);
+                                                        await salesController.addStore(
+                                                            context,
+                                                            mounted,
+                                                            _storeNameController
+                                                                .text,
+                                                            _storeAddressController
+                                                                .text,
+                                                            _storePhoneNumberController
+                                                                .text);
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20)),
+                                                    ),
+                                                    child: Text(
+                                                      "Tambah",
                                                       style: Theme.of(context)
                                                           .textTheme
-                                                          .headline4!
-                                                          .copyWith(
-                                                              color: Colors
-                                                                  .black)),
-                                                ),
-                                                buildAddStoreInput(
-                                                  context: context,
-                                                  label: "Nama Toko",
-                                                  hint: "Masukkan nama toko...",
-                                                  controller:
-                                                      _storeNameController,
-                                                ),
-                                                buildAddStoreInput(
-                                                  context: context,
-                                                  label: "Alamat",
-                                                  hint: "Masukkan alamat...",
-                                                  controller:
-                                                      _storeAddressController,
-                                                ),
-                                                buildAddStoreInput(
-                                                  context: context,
-                                                  label: "Nomer HP",
-                                                  hint: "Masukkan nomer hp...",
-                                                  controller:
-                                                      _storePhoneNumberController,
-                                                ),
-                                                buildAddStoreInput(
-                                                  context: context,
-                                                  label: "Kota",
-                                                  hint: "Masukkan kota...",
-                                                  controller:
-                                                      _storeCityBranchController,
-                                                ),
-                                                SizedBox(
-                                                    height: CustomPadding
-                                                        .mediumPadding),
-                                                SizedBox(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.9,
-                                                  child: ElevatedButton(
-                                                      onPressed: () async {
-                                                        if (_formAddStoreKey
-                                                            .currentState!
-                                                            .validate()) {
-                                                          Navigator.pop(
-                                                              context);
-                                                          await salesController.addStore(
-                                                              context,
-                                                              mounted,
-                                                              _storeNameController
-                                                                  .text,
-                                                              _storeAddressController
-                                                                  .text,
-                                                              _storePhoneNumberController
-                                                                  .text);
-                                                        }
-                                                      },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20)),
-                                                      ),
-                                                      child: Text(
-                                                        "Tambah",
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline6,
-                                                      )),
-                                                ),
-                                                SizedBox(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.9,
-                                                  child: ElevatedButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        shape: RoundedRectangleBorder(
-                                                            side: BorderSide(
-                                                                width: 2,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .colorScheme
-                                                                    .primary),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20)),
-                                                        backgroundColor:
-                                                            Theme.of(context)
-                                                                .colorScheme
-                                                                .onPrimary,
-                                                      ),
-                                                      child: Text(
-                                                        "Batal",
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headline6!
-                                                            .copyWith(
+                                                          .headline6,
+                                                    )),
+                                              ),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.9,
+                                                child: ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      shape: RoundedRectangleBorder(
+                                                          side: BorderSide(
+                                                              width: 2,
                                                               color: Theme.of(
                                                                       context)
                                                                   .colorScheme
-                                                                  .primary,
-                                                            ),
-                                                      )),
-                                                ),
-                                              ],
-                                            ),
+                                                                  .primary),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      20)),
+                                                      backgroundColor:
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .onPrimary,
+                                                    ),
+                                                    child: Text(
+                                                      "Batal",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline6!
+                                                          .copyWith(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .primary,
+                                                          ),
+                                                    )),
+                                              ),
+                                              SizedBox(
+                                                  height: CustomPadding
+                                                      .extraLargePadding)
+                                            ],
                                           ),
                                         ),
-                                      );
-                                    },
+                                      ),
+                                    ),
                                   );
                                 },
                               );
@@ -333,13 +325,13 @@ class _ChooseStoreState extends State<ChooseStore> {
                         //               ? Theme.of(context).colorScheme.secondary
                         //               : Theme.of(context).colorScheme.error),
                         // ),
-                        SizedBox(height: CustomPadding.largePadding),
+                        SizedBox(height: CustomPadding.extraLargePadding),
                       ],
                     ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(bottom: CustomPadding.largePadding),
+            padding: EdgeInsets.symmetric(vertical: CustomPadding.largePadding),
             child: Row(
               children: [
                 SizedBox(width: CustomPadding.largePadding),

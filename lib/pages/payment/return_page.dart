@@ -4,11 +4,17 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
 import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
 import 'package:flutter_alkabond_sales/pages/payment/payment_controller.dart';
+import 'package:flutter_alkabond_sales/pages/sales_history/sales_detail_page.dart';
+import 'package:flutter_alkabond_sales/pages/sales_history/sales_history_page.dart';
 import 'package:get/get.dart';
 
 class ReturnPage extends StatefulWidget {
-  const ReturnPage({super.key, required this.transactionDetailId});
+  const ReturnPage(
+      {super.key,
+      required this.transactionDetailId,
+      required this.transactionDetailType});
 
+  final HistoryType transactionDetailType;
   final int transactionDetailId;
 
   @override
@@ -133,6 +139,14 @@ class _ReturnPageState extends State<ReturnPage> {
                             returnDescription: desccriptionController.text,
                             context: context,
                             mounted: mounted);
+                        if (!mounted) return;
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SalesDetail(
+                                    type: widget.transactionDetailType,
+                                    transactionId:
+                                        widget.transactionDetailId)));
                       }
                     },
                     style: ElevatedButton.styleFrom(

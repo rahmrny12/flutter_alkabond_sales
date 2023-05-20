@@ -21,325 +21,354 @@ class ChooseProducts extends StatelessWidget {
 
     return SingleChildScrollView(
       child: GetBuilder<SalesController>(builder: (salesController) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9,
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                      foregroundColor:
-                          Theme.of(context).colorScheme.onSecondary,
-                    ),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(40))),
-                        builder: (context) {
-                          return GetBuilder<SalesController>(
-                              builder: (salesController) {
-                            return DraggableScrollableSheet(
-                              maxChildSize: 1,
-                              expand: false,
-                              initialChildSize: 0.9,
-                              minChildSize: 0.9,
-                              builder: (context, scrollController) {
-                                return Form(
-                                    key: formAddProductKey,
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                              top: CustomPadding.mediumPadding,
-                                              bottom:
-                                                  CustomPadding.smallPadding,
-                                              left: CustomPadding.mediumPadding,
-                                              right:
-                                                  CustomPadding.mediumPadding,
-                                            ),
-                                            child: Text('Jenis Produk',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline4!
-                                                    .copyWith(
-                                                        color: Colors.black)),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: CustomPadding
-                                                    .mediumPadding),
-                                            child: Wrap(
-                                              spacing: CustomPadding
-                                                  .extraSmallPadding,
-                                              children: [
-                                                ...List.generate(
-                                                  salesController
-                                                      .productTypes.length,
-                                                  (index) => GestureDetector(
-                                                    onTap: () {
-                                                      salesController
-                                                          .selectProductByType(
-                                                              salesController
-                                                                      .productTypes[
-                                                                  index]);
-                                                    },
-                                                    child:
-                                                        buildFilterProductType(
-                                                            context,
-                                                            salesController
-                                                                .productTypes[
-                                                                    index]
-                                                                .type,
-                                                            salesController
-                                                                .productTypes[
-                                                                    index]
-                                                                .id,
-                                                            salesController),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                top:
-                                                    CustomPadding.mediumPadding,
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondary,
+                      ),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(40))),
+                          builder: (context) {
+                            return GetBuilder<SalesController>(
+                                builder: (salesController) {
+                              return DraggableScrollableSheet(
+                                maxChildSize: 1,
+                                expand: false,
+                                initialChildSize: 0.9,
+                                minChildSize: 0.9,
+                                builder: (context, scrollController) {
+                                  return Form(
+                                      key: formAddProductKey,
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                top: CustomPadding.largePadding,
                                                 bottom:
                                                     CustomPadding.smallPadding,
                                                 left:
+                                                    CustomPadding.largePadding,
+                                                right:
                                                     CustomPadding.mediumPadding,
-                                                right: CustomPadding
-                                                    .mediumPadding),
-                                            child: Text('Produk',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline4!
-                                                    .copyWith(
-                                                        color: Colors.black)),
-                                          ),
-                                          (!salesController.isLoading.value)
-                                              ? Column(
-                                                  children: List.generate(
-                                                      salesController
-                                                          .products.length,
-                                                      (index) => RadioListTile<
-                                                              int>(
-                                                          title: Text(
-                                                              "${salesController.products[index].productName} - ${salesController.products[index].productBrand} - ${salesController.products[index].unitWeight}"),
-                                                          value: salesController
-                                                              .products[index]
-                                                              .id,
-                                                          groupValue:
-                                                              salesController
-                                                                      .selectedProduct
-                                                                      .value
-                                                                      ?.id ??
-                                                                  0,
-                                                          onChanged: (value) {
-                                                            salesController
-                                                                .setSelectedProduct(
-                                                                    salesController
-                                                                            .products[
-                                                                        index]);
-                                                          })),
-                                                )
-                                              : const Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                          SizedBox(
-                                              height:
-                                                  CustomPadding.mediumPadding),
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            margin: EdgeInsets.symmetric(
-                                                horizontal: CustomPadding
-                                                    .mediumPadding),
-                                            padding: EdgeInsets.symmetric(
-                                                vertical:
-                                                    CustomPadding.smallPadding),
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary,
-                                              border: Border(
-                                                  top: BorderSide(
-                                                      width: 1,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSecondary)),
+                                              ),
+                                              child: Text('Jenis Produk',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline4!
+                                                      .copyWith(
+                                                          color: Colors.black)),
                                             ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    fixedSize: Size(150, 45),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        24),
-                                                            side: BorderSide(
-                                                                width: 2,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .colorScheme
-                                                                    .primary)),
-                                                    backgroundColor:
-                                                        Theme.of(context)
-                                                            .colorScheme
-                                                            .onPrimary,
-                                                    foregroundColor:
-                                                        Theme.of(context)
-                                                            .colorScheme
-                                                            .primary,
-                                                  ),
-                                                  child: Text("Batal"),
-                                                ),
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: CustomPadding
+                                                      .mediumPadding),
+                                              child: Wrap(
+                                                spacing: CustomPadding
+                                                    .extraSmallPadding,
+                                                children: [
+                                                  ...List.generate(
                                                     salesController
-                                                        .addProductToSale();
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        24),
-                                                          ),
-                                                          fixedSize:
-                                                              Size(150, 45)),
-                                                  child: Text("Tambah"),
-                                                ),
-                                              ],
+                                                        .productTypes.length,
+                                                    (index) => GestureDetector(
+                                                      onTap: () {
+                                                        salesController
+                                                            .selectProductByType(
+                                                                salesController
+                                                                        .productTypes[
+                                                                    index]);
+                                                      },
+                                                      child:
+                                                          buildFilterProductType(
+                                                              context,
+                                                              salesController
+                                                                  .productTypes[
+                                                                      index]
+                                                                  .type,
+                                                              salesController
+                                                                  .productTypes[
+                                                                      index]
+                                                                  .id,
+                                                              salesController),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ));
-                              },
-                            );
-                          });
-                        },
-                      );
-                    },
-                    child: Text(
-                      "Tambah Produk",
-                      style: Theme.of(context).textTheme.headline6!.copyWith(
-                          color: Theme.of(context).colorScheme.onSecondary),
-                    ))),
-            ...List.generate(
-              salesController.selectedProductList.length,
-              (index) => buildProductCard(
-                  context, productSubtotalKey, salesController, index),
-            ),
-            if (salesController.selectedProductList.isNotEmpty)
-              buildTotalPaymentCard(context, salesController),
-            if (salesController.selectedProductList.isEmpty)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: CustomPadding.extraLargePadding),
-                  Image.asset(
-                    "$imagePath/product-empty.png",
-                    width: MediaQuery.of(context).size.width * 0.4,
-                  ),
-                  SizedBox(height: CustomPadding.mediumPadding),
-                  Text("Belum ada produk",
-                      style: Theme.of(context).textTheme.headline5),
-                  SizedBox(height: CustomPadding.extraLargePadding),
-                ],
-              ),
-            SizedBox(height: CustomPadding.mediumPadding),
-            Padding(
-              padding: EdgeInsets.only(bottom: CustomPadding.largePadding),
-              child: Row(
-                children: [
-                  SizedBox(width: CustomPadding.largePadding),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        pageController.previousPage(
-                            duration: Duration(milliseconds: 200),
-                            curve: Curves.easeIn);
-                        salesController.currentStep.value =
-                            pageController.page!.round();
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: CustomPadding
+                                                      .mediumPadding,
+                                                  bottom: CustomPadding
+                                                      .smallPadding,
+                                                  left: CustomPadding
+                                                      .mediumPadding,
+                                                  right: CustomPadding
+                                                      .mediumPadding),
+                                              child: Text('Produk',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline4!
+                                                      .copyWith(
+                                                          color: Colors.black)),
+                                            ),
+                                            (!salesController.isLoading.value)
+                                                ? Column(
+                                                    children: List.generate(
+                                                        salesController
+                                                            .products.length,
+                                                        (index) => RadioListTile<
+                                                                int>(
+                                                            title: Text(
+                                                                "${salesController.products[index].productName} - ${salesController.products[index].productBrand} - ${salesController.products[index].unitWeight}"),
+                                                            value:
+                                                                salesController
+                                                                    .products[
+                                                                        index]
+                                                                    .id,
+                                                            groupValue:
+                                                                salesController
+                                                                        .selectedProduct
+                                                                        .value
+                                                                        ?.id ??
+                                                                    0,
+                                                            onChanged: (value) {
+                                                              salesController
+                                                                  .setSelectedProduct(
+                                                                      salesController
+                                                                              .products[
+                                                                          index]);
+                                                            })),
+                                                  )
+                                                : Padding(
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical: CustomPadding
+                                                            .largePadding),
+                                                    child: const Center(
+                                                        child:
+                                                            CircularProgressIndicator()),
+                                                  ),
+                                            SizedBox(
+                                                height: CustomPadding
+                                                    .mediumPadding),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: CustomPadding
+                                                      .mediumPadding),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: CustomPadding
+                                                      .smallPadding),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
+                                                border: Border(
+                                                    top: BorderSide(
+                                                        width: 1,
+                                                        style: (salesController
+                                                                .isLoading
+                                                                .value)
+                                                            ? BorderStyle.none
+                                                            : BorderStyle.solid,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSecondary)),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                mainAxisSize: MainAxisSize.max,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      salesController
+                                                          .selectedProductType
+                                                          .value = null;
+                                                      salesController
+                                                          .fetchProductsByType();
+                                                      Navigator.pop(context);
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      fixedSize: Size(150, 45),
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(24),
+                                                          side: BorderSide(
+                                                              width: 2,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .primary)),
+                                                      backgroundColor:
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .onPrimary,
+                                                      foregroundColor:
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .primary,
+                                                    ),
+                                                    child: Text("Batal"),
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      salesController
+                                                          .selectedProductType
+                                                          .value = null;
+                                                      salesController
+                                                          .fetchProductsByType();
+                                                      salesController
+                                                          .addProductToSale();
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          24),
+                                                            ),
+                                                            fixedSize:
+                                                                Size(150, 45)),
+                                                    child: Text("Tambah"),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ));
+                                },
+                              );
+                            });
+                          },
+                        );
                       },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.background,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(
-                                  width: 2,
-                                  color:
-                                      Theme.of(context).colorScheme.primary))),
-                      child: Text("Kembali"),
+                      child: Text(
+                        "Tambah Produk",
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ))),
+              ...List.generate(
+                salesController.selectedProductList.length,
+                (index) => buildProductCard(
+                    context, productSubtotalKey, salesController, index),
+              ),
+              if (salesController.selectedProductList.isNotEmpty)
+                buildTotalPaymentCard(context, salesController),
+              if (salesController.selectedProductList.isEmpty)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: CustomPadding.extraLargePadding),
+                    Image.asset(
+                      "$imagePath/product-empty.png",
+                      width: MediaQuery.of(context).size.width * 0.4,
                     ),
-                  ),
-                  SizedBox(width: CustomPadding.largePadding),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        bool checkPriceAndQuantity() {
-                          for (var element
-                              in salesController.selectedProductList) {
-                            var quantity = element["quantity"];
-                            var price = element["price"];
-                            if (quantity == "0" || price == "0") {
-                              return false;
-                            }
-                          }
-                          return true;
-                        }
-
-                        if (salesController.selectedProductList.isEmpty) {
-                          buildAlertSnackBar(
-                              context, "Pilih produk terlebih dahulu...");
-                        } else if (!checkPriceAndQuantity()) {
-                          buildAlertSnackBar(context,
-                              "Pilih harga dan jumlah produk terlebih dahulu...");
-                        } else {
-                          pageController.nextPage(
+                    SizedBox(height: CustomPadding.mediumPadding),
+                    Text("Belum ada produk",
+                        style: Theme.of(context).textTheme.headline5),
+                    SizedBox(height: CustomPadding.extraLargePadding),
+                  ],
+                ),
+              SizedBox(height: CustomPadding.mediumPadding),
+              Padding(
+                padding: EdgeInsets.only(bottom: CustomPadding.largePadding),
+                child: Row(
+                  children: [
+                    SizedBox(width: CustomPadding.largePadding),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          pageController.previousPage(
                               duration: Duration(milliseconds: 200),
                               curve: Curves.easeIn);
                           salesController.currentStep.value =
                               pageController.page!.round();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20))),
-                      child: Text("Selanjutnya"),
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.background,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                side: BorderSide(
+                                    width: 2,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary))),
+                        child: Text("Kembali"),
+                      ),
                     ),
-                  ),
-                  SizedBox(width: CustomPadding.largePadding),
-                ],
+                    SizedBox(width: CustomPadding.largePadding),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          bool checkPriceAndQuantity() {
+                            for (var element
+                                in salesController.selectedProductList) {
+                              var quantity = element["quantity"];
+                              var price = element["price"];
+                              if (quantity == "0" || price == "0") {
+                                return false;
+                              }
+                            }
+                            return true;
+                          }
+
+                          if (salesController.selectedProductList.isEmpty) {
+                            buildAlertSnackBar(
+                                context, "Pilih produk terlebih dahulu...");
+                          } else if (!checkPriceAndQuantity()) {
+                            buildAlertSnackBar(context,
+                                "Pilih harga dan jumlah produk terlebih dahulu...");
+                          } else {
+                            pageController.nextPage(
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeIn);
+                            salesController.currentStep.value =
+                                pageController.page!.round();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20))),
+                        child: Text("Selanjutnya"),
+                      ),
+                    ),
+                    SizedBox(width: CustomPadding.largePadding),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       }),
     );
@@ -498,6 +527,7 @@ class ChooseProducts extends StatelessWidget {
                   child: TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return '$label wajib diisi.';

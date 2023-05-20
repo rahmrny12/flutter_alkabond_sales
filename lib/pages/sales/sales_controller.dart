@@ -74,7 +74,7 @@ class SalesController extends GetxController {
 
   void selectProductByType(TypeModel type) {
     selectedProductType.value = type;
-    fetchProductsByType(productType: type);
+    fetchProductsByType();
     update();
   }
 
@@ -173,15 +173,13 @@ class SalesController extends GetxController {
     return productTypes;
   }
 
-  void fetchProductsByType({
-    TypeModel? productType,
-  }) async {
+  void fetchProductsByType() async {
     isLoading(true);
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       http.Response response = await http.get(
           Uri.parse(
-              "$baseUrl/api/product?type=${productType?.type == null ? '' : productType!.type}"),
+              "$baseUrl/api/product?type=${selectedProductType.value?.type ?? ''}"),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -192,12 +190,15 @@ class SalesController extends GetxController {
         products = productModelFromJson(productJson);
         update();
       } else {
-        log(response.body);
+        throw Exception(response.body);
       }
     } on Exception catch (e) {
       log(e.toString());
+      buildCustomToast(
+          "Terjadi masalah. Error :  ${e.toString()}", MessageType.failed);
+    } finally {
+      isLoading(false);
     }
-    isLoading(false);
   }
 
   Future<void> checkoutOrder(BuildContext context, bool mounted) async {
@@ -247,6 +248,9 @@ class SalesController extends GetxController {
         log(response.body);
       }
     } on Exception catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      buildAlertSnackBar(context, "Terjadi masalah. Error : ${e.toString()}");
       log(e.toString());
     }
   }

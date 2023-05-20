@@ -31,6 +31,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     initPrefs();
+    dashboardController.checkEmail();
 
     _scrollController = ScrollController()
       ..addListener(() {

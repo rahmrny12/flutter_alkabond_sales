@@ -84,15 +84,19 @@ class PaymentController extends GetxController {
             ));
       } else if (json['status_code'] == 401) {
         if (!mounted) return;
-        buildAlertSnackBar(
-            context, "Jumlah return melebihi jumlah pembelian produk..!");
+        buildCustomToast("Jumlah return melebihi jumlah pembelian produk..!",
+            MessageType.failed);
         log(response.body);
       } else {
         if (!mounted) return;
+        buildCustomToast("Terjadi kesalahan. Produk telah direturn sebelumnya",
+            MessageType.failed);
         log(response.body);
       }
     } on Exception catch (e) {
       if (!mounted) return;
+      buildCustomToast(
+          "Terjadi kesalahan. ${e.toString()}", MessageType.failed);
       Navigator.pop(context);
       log(e.toString());
     }
@@ -116,9 +120,10 @@ class PaymentController extends GetxController {
     Navigator.pop(context);
     Navigator.pop(context);
     if (response.statusCode == 200 && json['status_code'] == 200) {
-      buildAlertSnackBar(context, "Return dibatalkan.");
+      buildCustomToast("Return dibatalkan.", MessageType.success);
     } else {
-      buildAlertSnackBar(context, "Terjadi masalah. Coba lagi nanti");
+      buildCustomToast("Terjadi masalah. Coba lagi nanti", MessageType.success);
+      log(json);
     }
   }
 }

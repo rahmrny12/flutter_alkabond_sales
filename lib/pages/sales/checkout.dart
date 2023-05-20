@@ -84,7 +84,6 @@ class _CheckoutState extends State<Checkout> {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Image.asset(
                     "$imagePath/icon/user.png",

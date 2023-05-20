@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
 import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
+import 'package:flutter_alkabond_sales/pages/login/login_page.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,11 +14,18 @@ class DashboardController extends GetxController {
   var transactionCount = 0.obs;
   var thisMonthTransactionCount = 0.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchDashboard();
+  checkEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString('email');
+    if (email != null) {
+      fetchDashboard();
+    }
   }
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  // }
 
   Future fetchDashboard() async {
     try {

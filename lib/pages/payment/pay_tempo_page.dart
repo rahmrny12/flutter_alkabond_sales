@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -46,146 +48,158 @@ class _PayTempoPageState extends State<PayTempoPage> {
         SliverToBoxAdapter(
           child: Column(
             children: [
-              SizedBox(height: CustomPadding.mediumPadding),
-              if (widget.type.name != "done")
-                Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: CustomPadding.mediumPadding),
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            fontWeight: FontWeight.w400),
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            totalPayController.text = value;
-                          }
-                        },
-                        decoration: InputDecoration(
-                          filled: true,
-                          prefixIcon: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: CustomPadding.smallPadding,
-                                  right: CustomPadding.extraSmallPadding,
-                                  bottom: CustomPadding.extraSmallPadding / 2,
-                                ),
-                                child: Text(
-                                  'Pembayaran : ',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline6!
-                                      .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary),
-                                ),
-                              )
-                            ],
-                          ),
-                          fillColor: Theme.of(context).colorScheme.surface,
-                          border: const OutlineInputBorder(
-                              borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                            topLeft: Radius.circular(10),
-                            bottomLeft: Radius.circular(10),
-                          )),
-                          contentPadding: EdgeInsets.only(
-                              left: CustomPadding.mediumPadding),
-                          hintText: "Masukkan nominal pembayaran",
-                          hintStyle: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: CustomPadding.smallPadding),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding:
-                            EdgeInsets.only(right: CustomPadding.mediumPadding),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (totalPayController.text.isNotEmpty ||
-                                int.parse(totalPayController.text) < 1000) {
-                              showConfirmationDialog(
-                                context: context,
-                                text: "Apakah nominal pembayaran sudah benar?",
-                                onPressed: () async {
-                                  Navigator.pop(context);
-                                  buildLoadingDialog(context);
-                                  var result =
-                                      await paymentController.storePayment(
-                                          transactionId: widget.transactionId,
-                                          totalPay: totalPayController.text,
-                                          context: context,
-                                          mounted: mounted);
-                                  if (result != null &&
-                                      result['status_code'] == 200) {
-                                    if (!mounted) return;
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => SalesDetail(
-                                                type: widget.type,
-                                                transactionId:
-                                                    widget.transactionId)));
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SuccessPage(
-                                                  successType:
-                                                      SuccessType.payment),
-                                        ));
-                                  } else if (result['status_code'] == 401 &&
-                                      result['status'] == 'invalid') {
-                                    if (!mounted) return;
-                                    Navigator.pop(context);
-                                    buildAlertSnackBar(context,
-                                        "Jumlah pembayaran terlalu besar.");
-                                  } else {
-                                    if (!mounted) return;
-                                    Navigator.pop(context);
-                                    buildAlertSnackBar(
-                                        context, "Pembayaran sudah lunas.");
-                                  }
-                                },
-                              );
-                            } else {
-                              buildAlertSnackBar(
-                                  context, "Isi nominal pembayaran");
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: CustomPadding.largePadding,
-                                  vertical: CustomPadding.extraSmallPadding),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              )),
-                          child: Text(
-                            "Bayar",
-                            style: Theme.of(context).textTheme.headline5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               SizedBox(height: CustomPadding.largePadding),
+              (widget.type.name != "done")
+                  ? Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: CustomPadding.mediumPadding),
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                    fontWeight: FontWeight.w400),
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                totalPayController.text = value;
+                              }
+                            },
+                            decoration: InputDecoration(
+                              filled: true,
+                              prefixIcon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: CustomPadding.smallPadding,
+                                      right: CustomPadding.extraSmallPadding,
+                                      bottom:
+                                          CustomPadding.extraSmallPadding / 2,
+                                    ),
+                                    child: Text(
+                                      'Pembayaran : ',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              fillColor: Theme.of(context).colorScheme.surface,
+                              border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                                topLeft: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                              )),
+                              contentPadding: EdgeInsets.only(
+                                  left: CustomPadding.mediumPadding),
+                              hintText: "Masukkan nominal pembayaran",
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: CustomPadding.smallPadding),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                right: CustomPadding.mediumPadding),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (totalPayController.text.isNotEmpty ||
+                                    int.parse(totalPayController.text) < 1000) {
+                                  showConfirmationDialog(
+                                    context: context,
+                                    text:
+                                        "Apakah nominal pembayaran sudah benar?",
+                                    onPressed: () async {
+                                      Navigator.pop(context);
+                                      buildLoadingDialog(context);
+                                      Map result =
+                                          await paymentController.storePayment(
+                                              transactionId:
+                                                  widget.transactionId,
+                                              totalPay: totalPayController.text,
+                                              context: context,
+                                              mounted: mounted);
+                                      if (result.containsKey("status_code") &&
+                                          result['status_code'] == 200) {
+                                        if (!mounted) return;
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SalesDetail(
+                                                        type: widget.type,
+                                                        transactionId: widget
+                                                            .transactionId)));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SuccessPage(
+                                                      successType:
+                                                          SuccessType.payment),
+                                            ));
+                                      } else if (result['status_code'] == 401 &&
+                                          result['status'] == 'invalid') {
+                                        if (!mounted) return;
+                                        Navigator.pop(context);
+                                        buildAlertSnackBar(context,
+                                            "Jumlah pembayaran terlalu besar.");
+                                      } else {
+                                        if (!mounted) return;
+                                        Navigator.pop(context);
+                                        buildAlertSnackBar(
+                                            context, "Pembayaran sudah lunas.");
+                                      }
+                                    },
+                                  );
+                                } else {
+                                  buildAlertSnackBar(
+                                      context, "Isi nominal pembayaran");
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: CustomPadding.largePadding,
+                                      vertical:
+                                          CustomPadding.extraSmallPadding),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  )),
+                              child: Text(
+                                "Bayar",
+                                style: Theme.of(context).textTheme.headline5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : buildPaymentDone(),
+              SizedBox(height: CustomPadding.extraLargePadding),
               Align(
                 alignment: Alignment.bottomLeft,
                 child: Padding(
@@ -249,6 +263,33 @@ class _PayTempoPageState extends State<PayTempoPage> {
       ),
     );
   }
+
+  Widget buildPaymentDone() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: CustomPadding.mediumPadding),
+      padding: EdgeInsets.all(CustomPadding.smallPadding),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Theme.of(context).colorScheme.surface,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Pembayaran Cicilan Sudah lunas",
+            style: Theme.of(context)
+                .textTheme
+                .headline5!
+                .copyWith(color: Theme.of(context).colorScheme.primary),
+          ),
+          Icon(
+            Icons.done,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class TotalCard extends SliverPersistentHeaderDelegate {
@@ -257,7 +298,7 @@ class TotalCard extends SliverPersistentHeaderDelegate {
   final int remainingPay;
 
   @override
-  double get maxExtent => 260 + 260 / 2;
+  double get maxExtent => 260 + 100 / 2;
 
   @override
   double get minExtent => kToolbarHeight;
