@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +27,7 @@ class _ChooseStoreState extends State<ChooseStore> {
   final TextEditingController _storeAddressController = TextEditingController();
   final TextEditingController _storePhoneNumberController =
       TextEditingController();
-  final TextEditingController _storeCityBranchController =
-      TextEditingController();
+  int? _storeCityBranchController;
   final SalesController salesController = Get.put(SalesController());
 
   @override
@@ -189,6 +190,70 @@ class _ChooseStoreState extends State<ChooseStore> {
                                                 controller:
                                                     _storePhoneNumberController,
                                               ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: CustomPadding
+                                                        .extraSmallPadding),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("Cabang Kota",
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline6!
+                                                            .copyWith(
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .onSecondary,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400)),
+                                                    SizedBox(
+                                                        height: CustomPadding
+                                                                .smallPadding /
+                                                            2),
+                                                    DropdownButtonFormField(
+                                                      items: salesController
+                                                          .cityBranches
+                                                          .map((e) =>
+                                                              DropdownMenuItem(
+                                                                  value: e.id,
+                                                                  child: Text(e
+                                                                      .branch)))
+                                                          .toList(),
+                                                      onChanged: (value) =>
+                                                          setState(() =>
+                                                              _storeCityBranchController =
+                                                                  value),
+                                                      value:
+                                                          _storeCityBranchController,
+                                                      validator: (value) {
+                                                        if (value == null) {
+                                                          return 'Cabang Kota wajib diisi.';
+                                                        }
+                                                        return null;
+                                                      },
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline6!
+                                                          .copyWith(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .onSecondary,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                      decoration:
+                                                          addStoreInputDecoration(
+                                                              context,
+                                                              "Masukkan cabang toko..."),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                               SizedBox(
                                                   height: CustomPadding
                                                       .mediumPadding),
@@ -211,7 +276,8 @@ class _ChooseStoreState extends State<ChooseStore> {
                                                             _storeAddressController
                                                                 .text,
                                                             _storePhoneNumberController
-                                                                .text);
+                                                                .text,
+                                                            _storeCityBranchController!);
                                                       }
                                                     },
                                                     style: ElevatedButton
@@ -425,21 +491,23 @@ class _ChooseStoreState extends State<ChooseStore> {
             style: Theme.of(context).textTheme.headline6!.copyWith(
                 color: Theme.of(context).colorScheme.onSecondary,
                 fontWeight: FontWeight.w400),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              contentPadding:
-                  EdgeInsets.only(left: CustomPadding.mediumPadding),
-              hintText: hint,
-              hintStyle: Theme.of(context).textTheme.headline6!.copyWith(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                  fontWeight: FontWeight.w400),
-            ),
+            decoration: addStoreInputDecoration(context, hint),
           ),
         ],
       ),
+    );
+  }
+
+  InputDecoration addStoreInputDecoration(BuildContext context, String hint) {
+    return InputDecoration(
+      filled: true,
+      fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      contentPadding: EdgeInsets.only(left: CustomPadding.mediumPadding),
+      hintText: hint,
+      hintStyle: Theme.of(context).textTheme.headline6!.copyWith(
+          color: Theme.of(context).colorScheme.onSecondary,
+          fontWeight: FontWeight.w400),
     );
   }
 }

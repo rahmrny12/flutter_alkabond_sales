@@ -204,7 +204,7 @@ class _CheckoutState extends State<Checkout> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.6,
+                              width: MediaQuery.of(context).size.width * 0.5,
                               child: Text("Total Pembayaran",
                                   style: Theme.of(context)
                                       .textTheme
@@ -297,12 +297,12 @@ class _CheckoutState extends State<Checkout> {
       BuildContext context, Map<String, dynamic> selectedProductList) {
     ProductModel product = selectedProductList['product'];
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: CustomPadding.extraSmallPadding),
+      padding: EdgeInsets.symmetric(vertical: CustomPadding.smallPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.6,
+            width: MediaQuery.of(context).size.width * 0.5,
             child: Text(
                 "Subtotal untuk ${product.productName} - ${product.productBrand} - ${product.unitWeight}",
                 style: Theme.of(context).textTheme.headline6!.copyWith(
@@ -357,7 +357,7 @@ class _CheckoutState extends State<Checkout> {
           ),
           SizedBox(height: CustomPadding.extraSmallPadding),
           Text(
-            "Harga : ${parseToRupiah(int.parse(selectedProductList['price']))}",
+            "Harga : ${parseToRupiah(rupiahStringToInt(selectedProductList['price']))}",
             style: Theme.of(context)
                 .textTheme
                 .headline6!

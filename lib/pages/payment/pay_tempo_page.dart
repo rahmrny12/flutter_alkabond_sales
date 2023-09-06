@@ -1,10 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/constant.dart';
 import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
+import 'package:flutter_alkabond_sales/helper/rupiah_input_formatter.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
 import 'package:flutter_alkabond_sales/pages/payment/payment_controller.dart';
 import 'package:flutter_alkabond_sales/pages/sales_history/sales_detail_page.dart';
@@ -57,6 +59,10 @@ class _PayTempoPageState extends State<PayTempoPage> {
                               horizontal: CustomPadding.mediumPadding),
                           child: TextField(
                             keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              RupiahInputFormatter(),
+                            ],
                             style: Theme.of(context)
                                 .textTheme
                                 .headline6!
@@ -134,46 +140,12 @@ class _PayTempoPageState extends State<PayTempoPage> {
                                     onPressed: () async {
                                       Navigator.pop(context);
                                       buildLoadingDialog(context);
-                                      Map result =
-                                          await paymentController.storePayment(
-                                              transactionId:
-                                                  widget.transactionId,
-                                              totalPay: totalPayController.text,
-                                              context: context,
-                                              mounted: mounted);
-                                      if (result.containsKey("status_code") &&
-                                          result['status_code'] == 200) {
-                                        if (!mounted) return;
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SalesDetail(
-                                                        type: widget.type,
-                                                        transactionId: widget
-                                                            .transactionId)));
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SuccessPage(
-                                                      successType:
-                                                          SuccessType.payment),
-                                            ));
-                                      } else if (result['status_code'] == 401 &&
-                                          result['status'] == 'invalid') {
-                                        if (!mounted) return;
-                                        Navigator.pop(context);
-                                        buildAlertSnackBar(context,
-                                            "Jumlah pembayaran terlalu besar.");
-                                      } else {
-                                        if (!mounted) return;
-                                        Navigator.pop(context);
-                                        buildAlertSnackBar(
-                                            context, "Pembayaran sudah lunas.");
-                                      }
+                                      await paymentController.storePayment(
+                                          transactionId: widget.transactionId,
+                                          type: widget.type,
+                                          totalPay: totalPayController.text,
+                                          context: context,
+                                          mounted: mounted);
                                     },
                                   );
                                 } else {

@@ -45,25 +45,23 @@ class SalesHistoryController extends GetxController {
     try {
       isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      http.Response response = await http.get(
-          Uri.parse(
-              "$baseUrl/api/transaction/al?filter=$filter&storeId=${storeId.value ?? ''}&from=${(from.value != null) ? DateFormat('yyyy-MM-dd').format(from.value!) : ''}&to=${(to.value != null) ? DateFormat('yyyy-MM-dd').format(to.value!) : ''}"),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ${prefs.getString('login_token')!}',
-          });
+      http.Response response =
+          await http.get(Uri.parse("$baseUrl/api/transaction/all"), headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('login_token')!}',
+      });
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {
         transactions = transactionModelFromJson(json['data']);
       } else {
         log(json.toString());
-        throw Exception("Terjadi masalah. Coba lagi nanti.");
+        throw Exception("Transaksi tidak ditemukan.");
       }
     } on Exception catch (e) {
       buildCustomToast(
-          "Terjadi kesalahan. ${e.toString()}", MessageType.success);
-      throw Exception("Terjadi masalah. Coba lagi nanti.");
+          "Terjadi kesalahan. ${e.toString()}", MessageType.failed);
+      // throw Exception("Terjadi masalah. Coba lagi nanti.");
     } finally {
       isLoading(false);
     }
@@ -95,29 +93,29 @@ class SalesHistoryController extends GetxController {
     return transaction;
   }
 
-  Future<bool> confirmDeliverySuccess(
-      BuildContext context, int transactionId) async {
-    try {
-      isLoading(true);
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      http.Response response = await http.post(
-          Uri.parse("$baseUrl/api/transaction/$transactionId/confirm"),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ${prefs.getString('login_token')!}',
-          });
-      var json = jsonDecode(response.body);
-      if (response.statusCode == 200 && json['status_code'] == 200) {
-        print(response.body);
-        return true;
-      } else {
-        log(response.body);
-      }
-    } on Exception catch (e) {
-      log(e.toString());
-    }
-    isLoading(false);
-    return false;
-  }
+  // Future<bool> confirmDeliverySuccess(
+  //     BuildContext context, int transactionId) async {
+  //   try {
+  //     isLoading(true);
+  //     final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     http.Response response = await http.post(
+  //         Uri.parse("$baseUrl/api/transaction/$transactionId/confirm"),
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Accept': 'application/json',
+  //           'Authorization': 'Bearer ${prefs.getString('login_token')!}',
+  //         });
+  //     var json = jsonDecode(response.body);
+  //     if (response.statusCode == 200 && json['status_code'] == 200) {
+  //       print(response.body);
+  //       return true;
+  //     } else {
+  //       log(response.body);
+  //     }
+  //   } on Exception catch (e) {
+  //     log(e.toString());
+  //   }
+  //   isLoading(false);
+  //   return false;
+  // }
 }

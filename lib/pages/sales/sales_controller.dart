@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
+import 'package:flutter_alkabond_sales/model/city_branch_model.dart';
 import 'package:flutter_alkabond_sales/model/product_model.dart';
 import 'package:flutter_alkabond_sales/model/store_model.dart';
 import 'package:flutter_alkabond_sales/model/transaction_model.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_alkabond_sales/pages/success_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:pretty_json/pretty_json.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constant.dart';
@@ -21,6 +23,7 @@ class SalesController extends GetxController {
   var errorMessage = "".obs;
   var successMessage = "".obs;
   List<StoreModel> stores = <StoreModel>[].obs;
+  List<CityBranchModel> cityBranches = <CityBranchModel>[].obs;
   List<ProductModel> products = <ProductModel>[].obs;
   List<TypeModel> productTypes = <TypeModel>[].obs;
 
@@ -63,7 +66,7 @@ class SalesController extends GetxController {
 
   void setProductSubTotal(int index, String price, String quantity) {
     selectedProductList[index]['subtotal'] =
-        int.parse(price) * int.parse(quantity);
+        rupiahStringToInt(price) * rupiahStringToInt(quantity);
     total.value = 0;
     for (var product in selectedProductList) {
       int subtotal = product['subtotal'];
@@ -109,6 +112,7 @@ class SalesController extends GetxController {
       if (response.statusCode == 200) {
         var json = response.body;
         stores = storeFromJson(json);
+        cityBranches = cityBranchesFromJson(json);
       } else {
         var json = response.body;
         log(json);
@@ -120,7 +124,7 @@ class SalesController extends GetxController {
   }
 
   Future<void> addStore(BuildContext context, bool mounted, String storeName,
-      String address, String storeNumber) async {
+      String address, String storeNumber, int storeCityBranch) async {
     try {
       isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -134,6 +138,7 @@ class SalesController extends GetxController {
             'store_name': storeName,
             'address': address,
             'store_number': storeNumber,
+            'city_branch_id': storeCityBranch,
           }));
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {
@@ -207,8 +212,8 @@ class SalesController extends GetxController {
       ProductModel product = item['product'];
       products["$index"] = {
         "product_id": product.id,
-        "quantity": item["quantity"],
-        "price": item["price"],
+        "quantity": int.parse(item["quantity"]),
+        "price": rupiahStringToInt(item["price"]),
       };
     });
 
@@ -226,7 +231,7 @@ class SalesController extends GetxController {
                 "store_id": selectedStore.value!.id,
                 "payment_method": "cash",
                 "status": "unpaid",
-                "detail": products,
+                "details": products,
               }));
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status_code'] == 200) {

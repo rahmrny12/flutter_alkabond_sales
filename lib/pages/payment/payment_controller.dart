@@ -15,11 +15,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PaymentController extends GetxController {
   var totalPay = 0.obs;
 
-  Future<dynamic> storePayment(
-      {required int transactionId,
-      required String totalPay,
-      required BuildContext context,
-      required bool mounted}) async {
+  Future<void> storePayment({
+    required int transactionId,
+    required String totalPay,
+    required BuildContext context,
+    required bool mounted,
+    required HistoryType type,
+  }) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       http.Response response =
@@ -30,11 +32,31 @@ class PaymentController extends GetxController {
                 'Authorization': 'Bearer ${prefs.getString('login_token')!}',
               },
               body: jsonEncode({
-                "total_pay": totalPay,
+                "total_pay": rupiahStringToInt(totalPay),
               }));
       if (response.statusCode == 200) {
-        var json = jsonDecode(response.body);
-        return json;
+        if (!mounted) return;
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const SuccessPage(successType: SuccessType.payment),
+            ));
+        // if (result.containsKey("status_code") && result['status_code'] == 200) {
+        //   if (!mounted) return;
+        // } else if (result['status_code'] == 401 &&
+        //     result['status'] == 'invalid') {
+        //   if (!mounted) return;
+        //   Navigator.pop(context);
+        //   buildAlertSnackBar(context, "Jumlah pembayaran terlalu besar.");
+        // } else {
+        //   if (!mounted) return;
+        //   Navigator.pop(context);
+        //   buildAlertSnackBar(context, "Pembayaran sudah lunas.");
+        // }
       } else {
         if (!mounted) return;
         Navigator.pop(context);
@@ -47,7 +69,6 @@ class PaymentController extends GetxController {
       buildAlertSnackBar(context, "Terjadi masalah. Coba lagi nanti.");
       log(e.toString());
     }
-    return json;
   }
 
   Future<void> productReturn(

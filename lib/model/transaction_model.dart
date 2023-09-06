@@ -24,12 +24,13 @@ class TransactionModel {
     required this.storeName,
     required this.address,
     required this.storeNumber,
-    required this.cityBranch,
+    required this.city,
+    required this.cityBranchSales,
+    required this.cityBranchStore,
     required this.salesName,
     required this.username,
     required this.email,
     required this.phoneNumber,
-    required this.city,
     required this.createdAt,
     required this.updatedAt,
     required this.payments,
@@ -48,12 +49,13 @@ class TransactionModel {
   String storeName;
   String address;
   String storeNumber;
-  String cityBranch;
+  String city;
+  String cityBranchSales;
+  String cityBranchStore;
   String salesName;
   String username;
   String email;
   String phoneNumber;
-  String city;
   DateTime createdAt;
   DateTime updatedAt;
   List<Payment> payments;
@@ -73,12 +75,13 @@ class TransactionModel {
         storeName: json["store_name"],
         address: json["address"],
         storeNumber: json["store_number"],
-        cityBranch: json["city_branch"],
+        city: json["city"],
+        cityBranchSales: json["city_branch_sales"],
+        cityBranchStore: json["city_branch_store"],
         salesName: json["sales_name"],
         username: json["username"],
         email: json["email"],
         phoneNumber: json["phone_number"],
-        city: json["city"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
         payments: List<Payment>.from(
@@ -101,12 +104,13 @@ class TransactionModel {
         "store_name": storeName,
         "address": address,
         "store_number": storeNumber,
-        "city_branch": cityBranch,
+        "city": city,
+        "city_branch_sales": cityBranchSales,
+        "city_branch_store": cityBranchStore,
         "sales_name": salesName,
         "username": username,
         "email": email,
         "phone_number": phoneNumber,
-        "city": city,
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "payments": List<dynamic>.from(payments.map((x) => x.toJson())),

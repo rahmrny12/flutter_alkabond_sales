@@ -41,6 +41,7 @@ class DashboardController extends GetxController {
         transactionCount.value = productJson['data']['transaction'];
         thisMonthTransactionCount.value =
             productJson['data']['this_month_transaction'];
+        update();
       } else {
         throw Exception(response.body);
       }

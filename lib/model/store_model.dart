@@ -5,8 +5,10 @@
 import 'dart:convert';
 import 'dart:developer';
 
-List<StoreModel> storeFromJson(String str) => List<StoreModel>.from(
-    json.decode(str)['data'].map((x) => StoreModel.fromJson(x)));
+List<StoreModel> storeFromJson(String str) {
+  return List<StoreModel>.from(
+      json.decode(str)['data']['stores'].map((x) => StoreModel.fromJson(x)));
+}
 
 String storeToJson(List<StoreModel> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
@@ -36,16 +38,18 @@ class StoreModel {
     return storeName.toString().contains(filter);
   }
 
-  factory StoreModel.fromJson(Map<String, dynamic> json) => StoreModel(
-        id: json["id"],
-        storeName: json["store_name"],
-        address: json["address"],
-        storeNumber: json["store_number"],
-        cityBranch: json["city_branch"],
-        salesId: json["sales_id"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-      );
+  factory StoreModel.fromJson(Map<String, dynamic> json) {
+    return StoreModel(
+      id: json["id"],
+      storeName: json["store_name"],
+      address: json["address"],
+      storeNumber: json["store_number"],
+      cityBranch: json["city_branch"],
+      salesId: json["sales_id"],
+      createdAt: DateTime.parse(json["created_at"]),
+      updatedAt: DateTime.parse(json["updated_at"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

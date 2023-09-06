@@ -429,7 +429,7 @@ class _SalesDetailState extends State<SalesDetail> {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
-                                              0.6,
+                                              0.5,
                                           child: Text("Total Pembayaran",
                                               style: Theme.of(context)
                                                   .textTheme
@@ -613,9 +613,65 @@ class _SalesDetailState extends State<SalesDetail> {
                     ),
                   );
                 }
-              } else {
+              } else if (snap.connectionState == ConnectionState.waiting) {
                 return Center(
                   child: CircularProgressIndicator(),
+                );
+              } else {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Terjadi masalah.",
+                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary),
+                      ),
+                      SizedBox(
+                        height: CustomPadding.mediumPadding,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: CustomPadding.largePadding),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          SalesDetail(
+                                            type: widget.type,
+                                            transactionId: widget.transactionId,
+                                          )));
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: CustomPadding.smallPadding)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Refresh ulang",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary),
+                                ),
+                                SizedBox(
+                                    width: CustomPadding.extraSmallPadding),
+                                Icon(Icons.refresh,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                              ],
+                            )),
+                      ),
+                    ],
+                  ),
                 );
               }
             });
@@ -667,121 +723,121 @@ class _SalesDetailState extends State<SalesDetail> {
                 .headline6!
                 .copyWith(color: Theme.of(context).colorScheme.onSecondary),
           ),
-          if (deliveryStatus == "sent" && paymentStatus != "paid")
-            (detail.returns?.id == null)
-                ? Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(top: CustomPadding.smallPadding),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReturnPage(
-                                    transactionDetailType: widget.type,
-                                    transactionDetailId: detail.id,
-                                  ),
-                                ));
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.onBackground,
-                              textStyle: Theme.of(context).textTheme.headline6,
-                              padding: EdgeInsets.symmetric(
-                                  vertical: CustomPadding.extraSmallPadding,
-                                  horizontal: CustomPadding.largePadding),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10))),
-                          child: Text("Return")),
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: CustomPadding.mediumPadding),
-                      Text(
-                        "Return",
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                      Text(
-                        "Keterangan return :",
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                      Text(
-                        detail.returns?.descriptionReturn ?? "-",
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                      SizedBox(height: CustomPadding.smallPadding),
-                      Text(
-                        "Jumlah return :",
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                      Text(
-                        "${detail.returns?.returnsReturn ?? "-"} Barang",
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding: EdgeInsets.only(
-                                top: CustomPadding.smallPadding),
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  showConfirmationDialog(
-                                    context: context,
-                                    text: "Yakin ingin membatalkan return?",
-                                    onPressed: () async {
-                                      buildLoadingDialog(context);
-                                      await paymentController.cancelReturn(
-                                          transactionDetailId: detail.id,
-                                          context: context,
-                                          mounted: mounted);
-                                      if (!mounted) return;
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => SalesDetail(
-                                                  type: widget.type,
-                                                  transactionId:
-                                                      widget.transactionId)));
-                                    },
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.surface,
-                                    padding: EdgeInsets.symmetric(
-                                        vertical:
-                                            CustomPadding.extraSmallPadding,
-                                        horizontal: CustomPadding.largePadding),
-                                    shape: RoundedRectangleBorder(
-                                        side: BorderSide(
-                                            width: 2,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onBackground),
-                                        borderRadius:
-                                            BorderRadius.circular(10))),
-                                child: Text(
-                                  "Batal Return",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline6!
-                                      .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onBackground),
-                                ))),
-                      )
-                    ],
-                  )
+          // if (deliveryStatus == "sent" && paymentStatus != "paid")
+          //   (detail.returns?.id == null)
+          //       ? Align(
+          //           alignment: Alignment.bottomRight,
+          //           child: Padding(
+          //             padding: EdgeInsets.only(top: CustomPadding.smallPadding),
+          //             child: ElevatedButton(
+          //                 onPressed: () {
+          //                   Navigator.push(
+          //                       context,
+          //                       MaterialPageRoute(
+          //                         builder: (context) => ReturnPage(
+          //                           transactionDetailType: widget.type,
+          //                           transactionDetailId: detail.id,
+          //                         ),
+          //                       ));
+          //                 },
+          //                 style: ElevatedButton.styleFrom(
+          //                     backgroundColor:
+          //                         Theme.of(context).colorScheme.onBackground,
+          //                     textStyle: Theme.of(context).textTheme.headline6,
+          //                     padding: EdgeInsets.symmetric(
+          //                         vertical: CustomPadding.extraSmallPadding,
+          //                         horizontal: CustomPadding.largePadding),
+          //                     shape: RoundedRectangleBorder(
+          //                         borderRadius: BorderRadius.circular(10))),
+          //                 child: Text("Return")),
+          //           ),
+          //         )
+          //       : Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             SizedBox(height: CustomPadding.mediumPadding),
+          //             Text(
+          //               "Return",
+          //               style: Theme.of(context).textTheme.headline6!.copyWith(
+          //                   fontWeight: FontWeight.w700,
+          //                   color: Theme.of(context).colorScheme.onSecondary),
+          //             ),
+          //             Text(
+          //               "Keterangan return :",
+          //               style: Theme.of(context).textTheme.headline6!.copyWith(
+          //                   color: Theme.of(context).colorScheme.onSecondary),
+          //             ),
+          //             Text(
+          //               detail.returns?.descriptionReturn ?? "-",
+          //               style: Theme.of(context).textTheme.headline6!.copyWith(
+          //                   color: Theme.of(context).colorScheme.onSecondary),
+          //             ),
+          //             SizedBox(height: CustomPadding.smallPadding),
+          //             Text(
+          //               "Jumlah return :",
+          //               style: Theme.of(context).textTheme.headline6!.copyWith(
+          //                   color: Theme.of(context).colorScheme.onSecondary),
+          //             ),
+          //             Text(
+          //               "${detail.returns?.returnsReturn ?? "-"} Barang",
+          //               style: Theme.of(context).textTheme.headline6!.copyWith(
+          //                   color: Theme.of(context).colorScheme.onSecondary),
+          //             ),
+          //             Align(
+          //               alignment: Alignment.bottomRight,
+          //               child: Padding(
+          //                   padding: EdgeInsets.only(
+          //                       top: CustomPadding.smallPadding),
+          //                   child: ElevatedButton(
+          //                       onPressed: () {
+          //                         showConfirmationDialog(
+          //                           context: context,
+          //                           text: "Yakin ingin membatalkan return?",
+          //                           onPressed: () async {
+          //                             buildLoadingDialog(context);
+          //                             await paymentController.cancelReturn(
+          //                                 transactionDetailId: detail.id,
+          //                                 context: context,
+          //                                 mounted: mounted);
+          //                             if (!mounted) return;
+          //                             Navigator.pushReplacement(
+          //                                 context,
+          //                                 MaterialPageRoute(
+          //                                     builder: (context) => SalesDetail(
+          //                                         type: widget.type,
+          //                                         transactionId:
+          //                                             widget.transactionId)));
+          //                           },
+          //                         );
+          //                       },
+          //                       style: ElevatedButton.styleFrom(
+          //                           backgroundColor:
+          //                               Theme.of(context).colorScheme.surface,
+          //                           padding: EdgeInsets.symmetric(
+          //                               vertical:
+          //                                   CustomPadding.extraSmallPadding,
+          //                               horizontal: CustomPadding.largePadding),
+          //                           shape: RoundedRectangleBorder(
+          //                               side: BorderSide(
+          //                                   width: 2,
+          //                                   color: Theme.of(context)
+          //                                       .colorScheme
+          //                                       .onBackground),
+          //                               borderRadius:
+          //                                   BorderRadius.circular(10))),
+          //                       child: Text(
+          //                         "Batal Return",
+          //                         style: Theme.of(context)
+          //                             .textTheme
+          //                             .headline6!
+          //                             .copyWith(
+          //                                 color: Theme.of(context)
+          //                                     .colorScheme
+          //                                     .onBackground),
+          //                       ))),
+          //             )
+          //           ],
+          //         )
         ],
       ),
     );
@@ -794,7 +850,7 @@ class _SalesDetailState extends State<SalesDetail> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.6,
+            width: MediaQuery.of(context).size.width * 0.5,
             child: Text(
                 "Subtotal untuk ${detail.productName} - ${detail.productBrand} - ${detail.unitWeight}",
                 style: Theme.of(context).textTheme.headline6!.copyWith(

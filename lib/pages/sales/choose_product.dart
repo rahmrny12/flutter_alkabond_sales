@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_alkabond_sales/helper/message_dialog.dart';
+import 'package:flutter_alkabond_sales/helper/rupiah_input_formatter.dart';
 import 'package:flutter_alkabond_sales/pages/sales/sales_controller.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../constant.dart';
 import '../../model/type_model.dart';
@@ -457,6 +460,7 @@ class ChooseProducts extends StatelessWidget {
                   index: index,
                   label: "Harga",
                   value: salesController.selectedProductList[index]['price'],
+                  isCurrency: true,
                   updateValue: (p0, p1) =>
                       salesController.setProductPrice(p0, p1),
                 ),
@@ -491,6 +495,7 @@ class ChooseProducts extends StatelessWidget {
     required String label,
     required int index,
     String? value,
+    bool isCurrency = false,
     void Function(dynamic, String)? updateValue,
     // TextEditingController? controller
   }) {
@@ -527,6 +532,10 @@ class ChooseProducts extends StatelessWidget {
                   child: TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      if (isCurrency) RupiahInputFormatter(),
+                    ],
                     textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {

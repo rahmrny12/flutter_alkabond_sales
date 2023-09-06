@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_alkabond_sales/custom_theme.dart';
 import 'package:flutter_alkabond_sales/pages/dashboard/dashboard_binding.dart';
@@ -19,6 +21,15 @@ import 'package:flutter_alkabond_sales/pages/success_page.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -30,6 +41,7 @@ Future<void> main() async {
   //   email == null;
   // }
 
+  HttpOverrides.global = MyHttpOverrides();
   runApp(MyApp(email: email));
 }
 

@@ -61,15 +61,15 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                 labelColor: Theme.of(context).colorScheme.primary,
                 unselectedLabelColor: Theme.of(context).colorScheme.onPrimary,
                 tabs: const [
-                  // Tab(
-                  //   text: "Proses",
-                  // ),
-                  // Tab(
-                  //   text: "Dikirim",
-                  // ),
-                  // Tab(
-                  //   text: "Cicilan",
-                  // ),
+                  Tab(
+                    text: "Proses",
+                  ),
+                  Tab(
+                    text: "Dikirim",
+                  ),
+                  Tab(
+                    text: "Cicilan",
+                  ),
                   Tab(
                     text: "Selesai",
                   ),
@@ -77,9 +77,9 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
           ),
           body: TabBarView(
             children: [
-              // buildProcessHistory(salesHistoryController, context),
-              // buildSentHistory(salesHistoryController, context),
-              // buildTempoHistory(salesHistoryController, context),
+              buildProcessHistory(salesHistoryController, context),
+              buildSentHistory(salesHistoryController, context),
+              buildTempoHistory(salesHistoryController, context),
               buildDoneHistory(salesHistoryController, context),
             ],
           )),
@@ -366,11 +366,6 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                             width: MediaQuery.of(context).size.width,
                             child: DropdownSearch<StoreModel>(
                               popupProps: PopupProps.dialog(
-                                  constraints: BoxConstraints(
-                                    maxHeight:
-                                        MediaQuery.of(context).size.height *
-                                            0.5,
-                                  ),
                                   dialogProps: DialogProps(
                                       backgroundColor: Theme.of(context)
                                           .colorScheme
@@ -464,7 +459,6 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                       padding: EdgeInsets.symmetric(
                           vertical: CustomPadding.smallPadding),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onPrimary,
                         border: Border(
                             top: BorderSide(
                                 width: 1,
