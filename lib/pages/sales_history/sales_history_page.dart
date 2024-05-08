@@ -31,6 +31,24 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
       Get.put(SalesHistoryController());
   SalesController salesController = Get.put(SalesController());
 
+  Future<List<TransactionModel>>? _processTransactions;
+  Future<List<TransactionModel>>? _sentTransactions;
+  Future<List<TransactionModel>>? _tempoTransactions;
+  Future<List<TransactionModel>>? _doneTransactions;
+
+  @override
+  void initState() {
+    _processTransactions =
+        salesHistoryController.fetchTransactions(HistoryType.process.name);
+    _sentTransactions =
+        salesHistoryController.fetchTransactions(HistoryType.sent.name);
+    _tempoTransactions =
+        salesHistoryController.fetchTransactions(HistoryType.tempo.name);
+    _doneTransactions =
+        salesHistoryController.fetchTransactions(HistoryType.done.name);
+    super.initState();
+  }
+
   @override
   void dispose() {
     salesHistoryController.initDate();
@@ -523,7 +541,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       buildFilterButton(context, HistoryType.done),
       FutureBuilder<List<TransactionModel>>(
-        future: salesHistoryController.fetchTransactions(HistoryType.done.name),
+        future: _doneTransactions,
         builder: (context, snap) {
           if (snap.hasData) {
             List<TransactionModel>? transactions = snap.data;
@@ -561,8 +579,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       buildFilterButton(context, HistoryType.tempo),
       FutureBuilder<List<TransactionModel>>(
-        future:
-            salesHistoryController.fetchTransactions(HistoryType.tempo.name),
+        future: _tempoTransactions,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.done) {
             List<TransactionModel>? transactions = snap.data;
@@ -602,7 +619,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       buildFilterButton(context, HistoryType.sent),
       FutureBuilder<List<TransactionModel>>(
-        future: salesHistoryController.fetchTransactions(HistoryType.sent.name),
+        future: _sentTransactions,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.done) {
             List<TransactionModel>? transactions = snap.data;
@@ -642,8 +659,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       buildFilterButton(context, HistoryType.process),
       FutureBuilder<List<TransactionModel>>(
-        future:
-            salesHistoryController.fetchTransactions(HistoryType.process.name),
+        future: _processTransactions,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.done) {
             List<TransactionModel>? transactions = snap.data;

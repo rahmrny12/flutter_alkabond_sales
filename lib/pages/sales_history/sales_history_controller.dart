@@ -45,13 +45,16 @@ class SalesHistoryController extends GetxController {
     try {
       isLoading(true);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      http.Response response =
-          await http.get(Uri.parse("$baseUrl/api/transaction/all"), headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ${prefs.getString('login_token')!}',
-      });
+      http.Response response = await http.get(
+          Uri.parse(
+              "$baseUrl/api/transaction/all?filter=$filter&storeId=${storeId.value ?? ''}&from=${(from.value != null) ? DateFormat('yyyy-MM-dd').format(from.value!) : ''}&to=${(to.value != null) ? DateFormat('yyyy-MM-dd').format(to.value!) : ''}"),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${prefs.getString('login_token')!}',
+          });
       var json = jsonDecode(response.body);
+      print('tes');
       if (response.statusCode == 200 && json['status_code'] == 200) {
         transactions = transactionModelFromJson(json['data']);
       } else {
